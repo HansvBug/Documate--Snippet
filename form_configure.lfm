@@ -1,0 +1,199 @@
+object Frm_Configure: TFrm_Configure
+  Left = 2606
+  Height = 288
+  Top = 169
+  Width = 749
+  Caption = 'Frm_Configure'
+  ClientHeight = 288
+  ClientWidth = 749
+  DesignTimePPI = 120
+  OnClose = FormClose
+  OnCreate = FormCreate
+  OnShow = FormShow
+  LCLVersion = '2.2.4.0'
+  object ButtonClose: TButton
+    Left = 645
+    Height = 31
+    Top = 248
+    Width = 94
+    Anchors = [akRight, akBottom]
+    Caption = 'Sluiten'
+    OnClick = ButtonCloseClick
+    TabOrder = 0
+  end
+  object PageControl1: TPageControl
+    Left = 0
+    Height = 240
+    Top = 0
+    Width = 749
+    ActivePage = TabSheetAppDatabase
+    Align = alTop
+    TabIndex = 1
+    TabOrder = 1
+    OnChange = PageControl1Change
+    object TabSheetDivers: TTabSheet
+      Caption = 'Divers'
+      ClientHeight = 207
+      ClientWidth = 741
+      object GroupBoxLogging: TGroupBox
+        Left = 288
+        Height = 100
+        Top = 24
+        Width = 216
+        Caption = 'Logging'
+        ClientHeight = 75
+        ClientWidth = 212
+        TabOrder = 0
+        object CheckBoxActivateLogging: TCheckBox
+          Left = 8
+          Height = 24
+          Top = 8
+          Width = 134
+          Caption = 'Logging is actief'
+          OnChange = CheckBoxActivateLoggingChange
+          OnMouseLeave = CheckBoxActivateLoggingMouseLeave
+          OnMouseMove = CheckBoxActivateLoggingMouseMove
+          TabOrder = 0
+        end
+        object CheckBoxAppendLogFile: TCheckBox
+          Left = 8
+          Height = 24
+          Top = 32
+          Width = 172
+          Caption = 'Aanvullen log bestand'
+          OnMouseLeave = CheckBoxAppendLogFileMouseLeave
+          OnMouseMove = CheckBoxAppendLogFileMouseMove
+          TabOrder = 1
+        end
+      end
+      object GroupBoxVisual: TGroupBox
+        Left = 16
+        Height = 100
+        Top = 24
+        Width = 231
+        Caption = 'Visueel'
+        ClientHeight = 75
+        ClientWidth = 227
+        TabOrder = 1
+        object CheckBoxBackGroundColorActiveControle: TCheckBox
+          Left = 16
+          Height = 24
+          Top = 8
+          Width = 143
+          Caption = 'Achtergrond kleur'
+          OnMouseLeave = CheckBoxBackGroundColorActiveControleMouseLeave
+          OnMouseMove = CheckBoxBackGroundColorActiveControleMouseMove
+          ParentShowHint = False
+          TabOrder = 0
+        end
+        object CheckBoxDisplayHelpText: TCheckBox
+          Left = 16
+          Height = 24
+          Top = 32
+          Width = 138
+          Caption = 'Toon hulpteksten'
+          OnChange = CheckBoxDisplayHelpTextChange
+          OnMouseLeave = CheckBoxDisplayHelpTextMouseLeave
+          OnMouseMove = CheckBoxDisplayHelpTextMouseMove
+          TabOrder = 1
+        end
+      end
+    end
+    object TabSheetAppDatabase: TTabSheet
+      Caption = 'App database'
+      ClientHeight = 207
+      ClientWidth = 741
+      object GroupBoxAppDb: TGroupBox
+        Left = 0
+        Height = 200
+        Top = 0
+        Width = 735
+        Anchors = [akTop, akLeft, akRight, akBottom]
+        ClientHeight = 175
+        ClientWidth = 731
+        TabOrder = 0
+        object LabelCopyDbFile: TLabel
+          Left = 8
+          Height = 20
+          Top = 8
+          Width = 174
+          Caption = 'Kopieer database bestand'
+          ParentColor = False
+        end
+        object EditCopyDbFile: TEdit
+          Left = 192
+          Height = 28
+          Hint = 'Kopieer het database bestand na elke xx keer starten.'
+          Top = 0
+          Width = 40
+          Alignment = taRightJustify
+          NumbersOnly = True
+          OnMouseLeave = EditCopyDbFileMouseLeave
+          OnMouseMove = EditCopyDbFileMouseMove
+          ParentShowHint = False
+          ShowHint = True
+          TabOrder = 0
+        end
+        object ButtonCompressSQLite: TButton
+          Left = 280
+          Height = 31
+          Top = -3
+          Width = 174
+          Caption = 'Compress database'
+          OnClick = ButtonCompressSQLiteClick
+          OnMouseLeave = ButtonCompressSQLiteMouseLeave
+          OnMouseMove = ButtonCompressSQLiteMouseMove
+          TabOrder = 1
+        end
+        object ButtonCopyDatabase: TButton
+          Left = 280
+          Height = 31
+          Top = 40
+          Width = 174
+          Caption = 'Copy Database'
+          OnClick = ButtonCopyDatabaseClick
+          OnMouseLeave = ButtonCopyDatabaseMouseLeave
+          OnMouseMove = ButtonCopyDatabaseMouseMove
+          TabOrder = 2
+        end
+        object Label1: TLabel
+          Left = 8
+          Height = 20
+          Top = 97
+          Width = 153
+          Caption = 'SQLite Library location:'
+          ParentColor = False
+        end
+        object EditSQLiteLibraryLocation: TEdit
+          Left = 192
+          Height = 28
+          Top = 89
+          Width = 479
+          Anchors = [akTop, akLeft, akRight]
+          OnMouseLeave = EditSQLiteLibraryLocationMouseLeave
+          OnMouseMove = EditSQLiteLibraryLocationMouseMove
+          TabOrder = 3
+        end
+        object SpeedButtonSQLliteDllLocation: TSpeedButton
+          Left = 689
+          Height = 28
+          Top = 89
+          Width = 29
+          Anchors = [akTop, akRight]
+          Caption = '...'
+          Flat = True
+          OnClick = SpeedButtonSQLliteDllLocationClick
+          ParentFont = False
+        end
+      end
+    end
+  end
+  object LabelStatus: TLabel
+    Left = 7
+    Height = 20
+    Top = 259
+    Width = 20
+    Caption = '     '
+    ParentColor = False
+  end
+end
