@@ -1,17 +1,18 @@
 object Frm_new_database: TFrm_new_database
-  Left = 2342
-  Height = 111
-  Top = 262
-  Width = 241
+  Left = 2958
+  Height = 156
+  Top = 189
+  Width = 566
   BorderStyle = bsToolWindow
   Caption = 'Frm_new_database'
-  ClientHeight = 111
-  ClientWidth = 241
+  ClientHeight = 156
+  ClientWidth = 566
   Color = clWindow
   DesignTimePPI = 120
   OnClose = FormClose
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
+  OnDestroy = FormDestroy
   OnShow = FormShow
   Position = poMainFormCenter
   LCLVersion = '2.2.4.0'
@@ -37,23 +38,64 @@ object Frm_new_database: TFrm_new_database
     TabOrder = 0
   end
   object ButtonNewFile: TButton
-    Left = 122
+    Left = 458
     Height = 31
-    Top = 64
+    Top = 88
     Width = 94
     Caption = 'Maak'
     Default = True
     OnClick = ButtonNewFileClick
     OnMouseLeave = ButtonNewFileMouseLeave
     OnMouseMove = ButtonNewFileMouseMove
+    TabOrder = 2
+  end
+  object LabelDescriptionShort: TLabel
+    Left = 24
+    Height = 20
+    Top = 56
+    Width = 124
+    Caption = 'Korte omschrijving'
+    ParentColor = False
+  end
+  object EditDescriptionShort: TEdit
+    Left = 168
+    Height = 28
+    Top = 48
+    Width = 384
+    OnChange = EditDescriptionShortChange
+    OnEnter = EditDescriptionShortEnter
+    OnExit = EditDescriptionShortExit
+    OnMouseLeave = EditDescriptionShortMouseLeave
+    OnMouseMove = EditDescriptionShortMouseMove
     TabOrder = 1
   end
-  object LabelStatus: TLabel
-    Left = 16
-    Height = 20
-    Top = 208
-    Width = 28
-    Caption = '       '
-    ParentColor = False
+  object ButtonCancel: TButton
+    Left = 352
+    Height = 31
+    Top = 88
+    Width = 94
+    Caption = 'Opnieuw'
+    OnClick = ButtonCancelClick
+    TabOrder = 3
+  end
+  object ButtonStop: TButton
+    Left = 248
+    Height = 31
+    Top = 88
+    Width = 94
+    Caption = 'Stop'
+    OnClick = ButtonStopClick
+    TabOrder = 4
+  end
+  object StatusBarFrmNewDb: TStatusBar
+    Left = 0
+    Height = 29
+    Top = 127
+    Width = 566
+    Panels = <    
+      item
+        Width = 275
+      end>
+    SimplePanel = False
   end
 end

@@ -15,7 +15,6 @@ type
 
   TBuildComponent = class(TObject)
     private
-      FAllPanels : TPanel;
       FColumns : Byte;
 
       _panel : TPanel;
@@ -173,7 +172,7 @@ begin
    _splitter := TSplitter.Create(mainForm);
    _splitter.Parent := aParent;
    _splitter.Name := aName;
-   _splitter.MinSize := 30;
+   //_splitter.MinSize := 30;
    _splitter.Width := 10;
    _splitter.Left := 9999;
    result := _splitter;
@@ -193,6 +192,7 @@ function TBuildComponent.CreateLabel(aName: String; aParent: TWinControl
   ): TLabel;
 begin
   _label := TLabel.Create(mainForm);
+  _label.Parent := aParent;
   _label.Name := aName;
   result := _label;
 end;
@@ -203,6 +203,7 @@ begin
   _listbox := TListBox.Create(mainForm);
   _listbox.Parent := aParent;
   _listbox.Name := aName;
+  _listbox.OnClick := @Form_Main.Frm_main.ListBoxOnClick;
   result := _listbox;
 end;
 
@@ -211,13 +212,12 @@ function TBuildComponent.CreateButton(aName: String; aParent: TWinControl
 begin
   _button := TButton.Create(mainForm);
   _button.Parent := aParent;
+  _button.Name := aName;
   _button.Height := 31;  // Default height
   _button.Width := 50;   // modified
   _button.OnClick :=  @Form_Main.Frm_main.ButtonNewOnClick; //
   result := _button;
 end;
-
-
 
 procedure TBuildComponent.BuildBodyPanelsAndSplitters(aParent: TWinControl);
 var
@@ -231,15 +231,21 @@ begin
     allPanels[i-1].Align := alLeft;
     allPanels[i-1].BevelOuter := bvNone;
 
+    if i = NumberOfColumns then begin // build 1 splitter less and align the last panel allClient
+      allPanels[i-1].Align := alClient;
+      break;
+    end;
+
     allSplitters[i-1] := CreateSplitter('Splitter_' + IntToStr(i), aParent);
-    allSplitters[i-1].AnchorSide[akRight].Control := allPanels[i-1];
+    allSplitters[i-1].Align := alLeft;
+    allSplitters[i-1].AnchorSide[akLeft].Control := allPanels[i-1];
   end;
 end;
 
 procedure TBuildComponent.BuildHeaderPanels;
 var
   i, newPanelNumber, allPanelsSize : Integer;
-  newPanels : array of TPanel;
+  newPanels : array of TPanel = nil;
 begin
   newPanelNumber := 1;
   for i := 0 to Length(allPanels)-1 do begin
@@ -266,7 +272,7 @@ end;
 procedure TBuildComponent.BuildSearchPanels;
 var
   i, newPanelNumber, allPanelsSize : Integer;
-  newPanels : array of TPanel;
+  newPanels : array of TPanel = nil;
 begin
   //create search panels
   newPanelNumber := 1;
@@ -299,7 +305,7 @@ begin
 
   for i := 0 to Length(allPanels)-1 do begin
     if Pos('PanelBody_' + IntToSTr(i+1), allpanels[i].Name) > 0 then begin
-      SetLength(newPanels, newPanelNumber);
+      SetLength({%H-}newPanels, newPanelNumber);{%H+}
       newPanels[newPanelNumber-1] := CreatePanel('PanelData_' + IntToStr(newPanelNumber), allPanels[i], 50);
       newPanels[newPanelNumber-1].Align := alClient;
       newPanels[newPanelNumber-1].Caption := 'PanelData_ '+ IntToStr(newPanelNumber);
@@ -325,7 +331,7 @@ end;
 
 procedure TBuildComponent.BuildListBoxes;
 var
-  newListBoxes : array of TListBox;
+  newListBoxes : array of TListBox = nil;
   i, newListBox : Integer;
 begin
   newListBox := 1;
@@ -341,7 +347,7 @@ end;
 
 procedure TBuildComponent.BuildEdit;
 var
-  newEditboxes : array of TEdit;
+  newEditboxes : array of TEdit = nil;
   i, newEditbox : Integer;
 begin
   newEditbox := 1;
@@ -358,7 +364,7 @@ end;
 
 procedure TBuildComponent.BuildButtons(aCaption : String);
 var
-  newButtons : array of TButton;
+  newButtons : array of TButton = nil;
   i, newButton : Integer;
 begin
   newButton := 1;

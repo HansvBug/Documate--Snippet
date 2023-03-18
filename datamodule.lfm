@@ -2,7 +2,7 @@ object DataModule1: TDataModule1
   OnCreate = DataModuleCreate
   OldCreateOrder = False
   Height = 267
-  HorizontalOffset = 3183
+  HorizontalOffset = 1350
   VerticalOffset = 581
   Width = 520
   PPI = 120
@@ -26,5 +26,26 @@ object DataModule1: TDataModule1
     Macros = <>
     Left = 360
     Top = 56
+  end
+  object SQLQueryRelItems: TSQLQuery
+    FieldDefs = <>
+    Transaction = SQLTransactionRelItems
+    Params = <>
+    Macros = <>
+    Left = 360
+    Top = 144
+  end
+  object SQLTransactionRelItems: TSQLTransaction
+    Active = False
+    Left = 240
+    Top = 144
+  end
+  object SQLite3ConnectionRelItems: TSQLite3Connection
+    Connected = False
+    LoginPrompt = False
+    KeepConnection = False
+    AlwaysUseBigint = False
+    Left = 79
+    Top = 144
   end
 end

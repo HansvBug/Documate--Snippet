@@ -35,32 +35,24 @@ type
     procedure ButtonCloseClick(Sender: TObject);
     procedure ButtonCompressSQLiteClick(Sender: TObject);
     procedure ButtonCompressSQLiteMouseLeave(Sender: TObject);
-    procedure ButtonCompressSQLiteMouseMove(Sender: TObject;
-      Shift: TShiftState; X, Y: Integer);
+    procedure ButtonCompressSQLiteMouseMove(Sender: TObject);
     procedure ButtonCopyDatabaseClick(Sender: TObject);
     procedure ButtonCopyDatabaseMouseLeave(Sender: TObject);
-    procedure ButtonCopyDatabaseMouseMove(Sender: TObject; Shift: TShiftState;
-      X, Y: Integer);
+    procedure ButtonCopyDatabaseMouseMove(Sender: TObject);
     procedure CheckBoxActivateLoggingChange(Sender: TObject);
     procedure CheckBoxActivateLoggingMouseLeave(Sender: TObject);
-    procedure CheckBoxActivateLoggingMouseMove(Sender: TObject;
-      Shift: TShiftState; X, Y: Integer);
+    procedure CheckBoxActivateLoggingMouseMove(Sender: TObject);
     procedure CheckBoxAppendLogFileMouseLeave(Sender: TObject);
-    procedure CheckBoxAppendLogFileMouseMove(Sender: TObject;
-      Shift: TShiftState; X, Y: Integer);
+    procedure CheckBoxAppendLogFileMouseMove(Sender: TObject);
     procedure CheckBoxBackGroundColorActiveControleMouseLeave(Sender: TObject);
-    procedure CheckBoxBackGroundColorActiveControleMouseMove(Sender: TObject;
-      Shift: TShiftState; X, Y: Integer);
+    procedure CheckBoxBackGroundColorActiveControleMouseMove(Sender: TObject);
     procedure CheckBoxDisplayHelpTextChange(Sender: TObject);
     procedure CheckBoxDisplayHelpTextMouseLeave(Sender: TObject);
-    procedure CheckBoxDisplayHelpTextMouseMove(Sender: TObject;
-      Shift: TShiftState; X, Y: Integer);
+    procedure CheckBoxDisplayHelpTextMouseMove(Sender: TObject);
     procedure EditCopyDbFileMouseLeave(Sender: TObject);
-    procedure EditCopyDbFileMouseMove(Sender: TObject; Shift: TShiftState; X,
-      Y: Integer);
+    procedure EditCopyDbFileMouseMove(Sender: TObject);
     procedure EditSQLiteLibraryLocationMouseLeave(Sender: TObject);
-    procedure EditSQLiteLibraryLocationMouseMove(Sender: TObject;
-      Shift: TShiftState; X, Y: Integer);
+    procedure EditSQLiteLibraryLocationMouseMove(Sender: TObject);
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -116,8 +108,7 @@ begin
   SetStatusLabelText(Visual.Helptext(Sender, ''));
 end;
 
-procedure TFrm_Configure.ButtonCompressSQLiteMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+procedure TFrm_Configure.ButtonCompressSQLiteMouseMove(Sender: TObject);
 begin
   SetStatusLabelText(Visual.Helptext(Sender, 'Comprimeer de database.'));
 end;
@@ -138,8 +129,7 @@ begin
   SetStatusLabelText(Visual.Helptext(Sender, ''));
 end;
 
-procedure TFrm_Configure.ButtonCopyDatabaseMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+procedure TFrm_Configure.ButtonCopyDatabaseMouseMove(Sender: TObject);
 begin
   SetStatusLabelText(Visual.Helptext(Sender, 'Maak nu een kopie van de applicatie database.'));
 end;
@@ -160,8 +150,7 @@ begin
   SetStatusLabelText(Visual.Helptext(Sender, ''));
 end;
 
-procedure TFrm_Configure.CheckBoxActivateLoggingMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+procedure TFrm_Configure.CheckBoxActivateLoggingMouseMove(Sender: TObject);
 begin
   SetStatusLabelText(Visual.Helptext(Sender, 'Activeer de log functionaliteit.'));
 end;
@@ -171,8 +160,7 @@ begin
   SetStatusLabelText(Visual.Helptext(Sender, ''));
 end;
 
-procedure TFrm_Configure.CheckBoxAppendLogFileMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+procedure TFrm_Configure.CheckBoxAppendLogFileMouseMove(Sender: TObject);
 begin
   SetStatusLabelText(Visual.Helptext(Sender, 'Vul het bestaande log aan.'));
 end;
@@ -184,7 +172,7 @@ begin
 end;
 
 procedure TFrm_Configure.CheckBoxBackGroundColorActiveControleMouseMove(
-  Sender: TObject; Shift: TShiftState; X, Y: Integer);
+  Sender: TObject);
 begin
   SetStatusLabelText(Visual.Helptext(Sender, 'Verander achtergrond kleur van het actieve invoerveld.'));
 end;
@@ -200,8 +188,7 @@ begin
   SetStatusLabelText(Visual.Helptext(Sender, ''));
 end;
 
-procedure TFrm_Configure.CheckBoxDisplayHelpTextMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+procedure TFrm_Configure.CheckBoxDisplayHelpTextMouseMove(Sender: TObject);
 begin
   SetStatusLabelText(Visual.Helptext(Sender, 'Toon hulpteksen als de muis over een component beweegt.'));
 end;
@@ -211,8 +198,7 @@ begin
   SetStatusLabelText(Visual.Helptext(Sender, ''));
 end;
 
-procedure TFrm_Configure.EditCopyDbFileMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+procedure TFrm_Configure.EditCopyDbFileMouseMove(Sender: TObject);
 begin
   SetStatusLabelText(Visual.Helptext(Sender, 'Er wordt een kopie van de applicatie database gemaakt na elke ... opstarten van de applicatie.'));
 end;
@@ -222,8 +208,7 @@ begin
   SetStatusLabelText(Visual.Helptext(Sender, ''));
 end;
 
-procedure TFrm_Configure.EditSQLiteLibraryLocationMouseMove(Sender: TObject;
-  Shift: TShiftState; X, Y: Integer);
+procedure TFrm_Configure.EditSQLiteLibraryLocationMouseMove(Sender: TObject);
 begin
   SetStatusLabelText(Visual.Helptext(Sender, 'Locatie en naam van het SQlite dll bestand. (sqlite3.dll)'));
 end;
@@ -234,6 +219,7 @@ begin
   SaveSettings;
   Visual.Free;
   SetMan.Free;
+  CloseAction := caFree;
 end;
 
 procedure TFrm_Configure.FormCreate(Sender: TObject);

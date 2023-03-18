@@ -17,7 +17,7 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <MinorVersionNr Value="1"/>
+      <MinorVersionNr Value="2"/>
       <Attributes pvaDebug="True"/>
       <StringTable Comments="Tool for documenting. (Snippet)" CompanyName="Hans van Buggenum" ProductName="Documate" ProductVersion="1.0.0.0"/>
     </VersionInfo>
@@ -103,6 +103,9 @@
       <FormatVersion Value="2"/>
     </RunParams>
     <RequiredPackages>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
       <Item>
         <PackageName Value="LCL"/>
       </Item>
@@ -192,6 +195,7 @@
         <Filename Value="datamodule.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="DataModule1"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="DataModule"/>
         <UnitName Value="DataModule"/>
       </Unit>

@@ -26,7 +26,6 @@ type
       procedure CreTable(TableName, SqlText, Version : String);
       function SelectMeta : Integer;
       procedure UpdateMeta(Version : String);
-      procedure CreateAllTables;
 
     public
       constructor Create(DbFileName : String); overload;
@@ -34,6 +33,7 @@ type
       function CreateNewDatabase : boolean;
       procedure InsertMeta(aKey, aValue : String);
       function IsFileInUse(FileName: TFileName): Boolean;
+      procedure CreateAllTables;
 
   end;
 implementation
@@ -46,6 +46,21 @@ const
                       'KEY      VARCHAR(50), ' +
                       'VALUE    VARCHAR(255));';
 
+  creTblItems =       'create table if not exists ' + ITEMS + ' (' +					  
+                      'ID              INTEGER      NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, ' +
+                      'GUID            VARCHAR(50)  UNIQUE                                   , ' +
+                      'LEVEL	       INTEGER                                               , ' +
+                      'NAME            VARCHAR(1000)                                         , ' +
+                      'DATE_CREATED    DATE                                                  , ' +
+                      'DATE_ALTERED    DATE                                                  , ' +
+                      'CREATED_BY      VARCHAR(100)                                          , ' +
+                      'ALTERED_BY      VARCHAR(100));';
+					  
+  creTblRelItems =    'create table if not exists ' + REL_ITEMS + ' (' +
+                      'ID              INTEGER      NOT NULL PRIMARY KEY AUTOINCREMENT UNIQUE, ' +
+                      'GUID            VARCHAR(50)  UNIQUE                                   , ' +
+                      'GUID_LEVEL_A    VARCHAR(50)                                           , ' +
+                      'GUID_LEVEL_B    VARCHAR(50));';
 
 function TCreateAppdatabase.CheckDatabaseFile: boolean;
 begin
@@ -364,10 +379,6 @@ procedure TCreateAppdatabase.UpdateMeta(Version: String);
     end;
 end;
 
-procedure TCreateAppdatabase.CreateAllTables;
-begin
-
-end;
 
 {%region constructor - destructor}
 constructor TCreateAppdatabase.Create(DbFileName : String);
@@ -396,11 +407,9 @@ begin
       if not FError then CreTable(SETTINGS_META, creTblSetmeta, '0');
       if not FError then InsertMeta('Version', '0');
       if not FError then InsertMeta('DatabaseName', ExtractFileName(dbFile));
-      if not FError then InsertMeta('Columns', IntToStr(Frm_Main.NumberOfColumns));
     end;
-
-    // Create the tables
-    CreateAllTables;
+		
+    CreateAllTables;  // Create the tables
     result := true;
   end
   else begin
@@ -408,5 +417,47 @@ begin
   end;
 end;
 
+procedure TCreateAppdatabase.CreateAllTables;
+var
+  Version : String;
+begin
+  if FileExists(dbFile) then begin
+    if (StrToInt(Settings.DataBaseVersion) >= 1) and (SelectMeta = 0) then begin  // (version 1 tables)
+      Version := '1';
+      if not FError then CreTable(ITEMS, creTblItems, Version);
+      if not FError then CreTable(REL_ITEMS, creTblRelItems, Version);
+
+
+      if not FError then UpdateMeta(Version);
+      Frm_Main.Logging.WriteToLogInfo('Het aanmaken/bijwerken van de database (tabellen) is gereed. (Versie: ' + Version + ').');
+    end;
+
+    if StrToInt(Settings.DataBaseVersion) > SelectMeta then begin
+      if SelectMeta < 3 then begin
+        //Version := '2';
+
+        //if not FError then SqliteUserVersion;
+        //if not FError then UpdateMeta(Version);
+
+        //Frm_Main.Logging.WriteToLogInfo('Het aanmaken/bijwerken van de database (tabellen) is gereed. (Versie: ' + Version + ').');
+      end;
+      {if SelectMeta < 4 then begin
+        Version := '3';
+        SqliteUserVersion;
+        //..
+      end;  }
+    end;
+
+    if not FError then begin
+      messageDlg('Gereed.', 'Het aanmaken/bijwerken van de database (tabellen) is gereed.', mtInformation, [mbOK],0);
+    end;
+  end
+  else begin  // database file does not exists
+    Frm_Main.Logging.WriteToLogError('De database is niet gevonden.');
+    messageDlg('Let op', 'De database is niet gevonden.', mtError, [mbOK],0);
+    FError := true;
+  end;
+end;
+  
 end.
 

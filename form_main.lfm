@@ -1,11 +1,11 @@
 object Frm_main: TFrm_main
-  Left = 2308
-  Height = 674
-  Top = 151
-  Width = 843
+  Left = 2300
+  Height = 600
+  Top = 271
+  Width = 1139
   Caption = 'Frm_main'
-  ClientHeight = 649
-  ClientWidth = 843
+  ClientHeight = 575
+  ClientWidth = 1139
   DesignTimePPI = 120
   Menu = MainMenu1
   OnClose = FormClose
@@ -16,47 +16,51 @@ object Frm_main: TFrm_main
   object StatusBarFrmMain: TStatusBar
     Left = 0
     Height = 29
-    Top = 620
-    Width = 843
+    Top = 546
+    Width = 1139
     Panels = <    
       item
-        Width = 200
+        Width = 500
+      end    
+      item
+        Alignment = taRightJustify
+        Width = 100
       end>
     SimplePanel = False
   end
   object PageControl1: TPageControl
     Left = 0
-    Height = 620
+    Height = 546
     Top = 0
-    Width = 843
+    Width = 1139
     ActivePage = TabSheet1
     Align = alClient
     TabIndex = 0
     TabOrder = 1
     object TabSheet1: TTabSheet
       Caption = 'TabSheet1'
-      ClientHeight = 587
-      ClientWidth = 835
+      ClientHeight = 513
+      ClientWidth = 1131
       object PairSplitter2: TPairSplitter
         Left = 0
-        Height = 587
+        Height = 513
         Top = 0
-        Width = 835
+        Width = 1131
         Align = alClient
-        Position = 700
+        Position = 900
         object PairSplitterSide3: TPairSplitterSide
           Cursor = crArrow
           Left = 0
-          Height = 587
+          Height = 513
           Top = 0
-          Width = 700
-          ClientWidth = 700
-          ClientHeight = 587
+          Width = 900
+          ClientWidth = 900
+          ClientHeight = 513
           object ScrollBoxColumns: TScrollBox
             Left = 0
-            Height = 587
+            Height = 513
             Top = 0
-            Width = 700
+            Width = 900
             HorzScrollBar.Page = 1
             VertScrollBar.Page = 1
             Align = alClient
@@ -65,61 +69,121 @@ object Frm_main: TFrm_main
         end
         object PairSplitterSide4: TPairSplitterSide
           Cursor = crArrow
-          Left = 705
-          Height = 587
+          Left = 905
+          Height = 513
           Top = 0
-          Width = 130
-          ClientWidth = 130
-          ClientHeight = 587
-          object Button1: TButton
-            Left = 24
-            Height = 31
-            Top = 536
-            Width = 94
-            Caption = 'Button1'
-            OnClick = Button1Click
+          Width = 226
+          ClientWidth = 226
+          ClientHeight = 513
+          object Edit1: TEdit
+            Left = 8
+            Height = 28
+            Top = 56
+            Width = 200
+            Anchors = [akTop, akLeft, akRight]
             TabOrder = 0
+            Text = 'Edit1'
           end
-          object Button2: TButton
-            Left = 21
-            Height = 31
+          object Edit2: TEdit
+            Left = 8
+            Height = 28
             Top = 96
-            Width = 94
-            Caption = 'Button2'
-            OnClick = Button2Click
+            Width = 200
+            Anchors = [akTop, akLeft, akRight]
             TabOrder = 1
+            Text = 'Edit2'
+          end
+          object Edit3: TEdit
+            Left = 8
+            Height = 28
+            Top = 136
+            Width = 200
+            Anchors = [akTop, akLeft, akRight]
+            TabOrder = 2
+            Text = 'Edit3'
+          end
+          object Edit4: TEdit
+            Left = 8
+            Height = 28
+            Top = 176
+            Width = 200
+            Anchors = [akTop, akLeft, akRight]
+            TabOrder = 3
+            Text = 'Edit4'
+          end
+          object Label1: TLabel
+            Left = 8
+            Height = 20
+            Top = 21
+            Width = 113
+            Caption = 'TMP ter controle:'
+            ParentColor = False
+          end
+          object Label2: TLabel
+            Left = 8
+            Height = 20
+            Top = 224
+            Width = 41
+            Caption = 'Parent'
+            ParentColor = False
+          end
+          object Edit5: TEdit
+            Left = 8
+            Height = 28
+            Top = 248
+            Width = 200
+            Anchors = [akTop, akLeft, akRight]
+            TabOrder = 4
+            Text = 'Edit5'
+          end
+          object Label3: TLabel
+            Left = 8
+            Height = 20
+            Top = 288
+            Width = 34
+            Caption = 'Child'
+            ParentColor = False
+          end
+          object Edit6: TEdit
+            Left = 8
+            Height = 28
+            Top = 320
+            Width = 200
+            Anchors = [akTop, akLeft, akRight]
+            TabOrder = 5
+            Text = 'Edit6'
           end
         end
       end
     end
     object TabSheet2: TTabSheet
       Caption = 'TabSheet2'
-      ClientHeight = 587
-      ClientWidth = 835
+      ClientHeight = 513
+      ClientWidth = 1131
       object PairSplitter1: TPairSplitter
         Left = 0
-        Height = 587
+        Height = 513
         Top = 0
-        Width = 835
+        Width = 1131
         Align = alClient
-        Position = 600
+        Position = 1000
         object PairSplitterSide1: TPairSplitterSide
           Cursor = crArrow
           Left = 0
-          Height = 587
+          Height = 513
           Top = 0
-          Width = 600
-          ClientWidth = 600
-          ClientHeight = 587
+          Width = 1000
+          ClientWidth = 1000
+          ClientHeight = 513
           object PanelBody: TPanel
             Left = 0
-            Height = 587
+            Height = 513
             Top = 0
             Width = 168
             Align = alLeft
             BevelOuter = bvNone
             Caption = 'PanelBody'
-            ClientHeight = 587
+            ClientHeight = 513
             ClientWidth = 168
             TabOrder = 0
             object PanelHeader: TPanel
@@ -134,7 +198,7 @@ object Frm_main: TFrm_main
             object PanelSearch: TPanel
               Left = 0
               Height = 62
-              Top = 525
+              Top = 451
               Width = 168
               Align = alBottom
               Caption = 'PanelSearch'
@@ -152,34 +216,53 @@ object Frm_main: TFrm_main
             end
             object PanelData_: TPanel
               Left = 0
-              Height = 463
+              Height = 389
               Top = 62
               Width = 168
               Align = alClient
               Caption = 'PanelData_'
-              ClientHeight = 463
+              ClientHeight = 389
               ClientWidth = 168
               TabOrder = 2
               object ListBox1: TListBox
-                Left = 24
-                Height = 100
-                Top = 120
-                Width = 93
-                ItemHeight = 0
+                Left = 15
+                Height = 176
+                Top = 8
+                Width = 132
+                Items.Strings = (
+                  '1'
+                  '2'
+                  '3'
+                  '4'
+                )
+                ItemHeight = 20
                 TabOrder = 0
+              end
+              object Button2: TButton
+                Left = 24
+                Height = 31
+                Top = 298
+                Width = 94
+                Caption = 'Button2'
+                OnClick = Button2Click
+                TabOrder = 1
               end
             end
           end
           object Splitter_: TSplitter
+            AnchorSideLeft.Control = PanelBody
+            AnchorSideRight.Control = PanelBodyVb
             Left = 168
-            Height = 587
+            Height = 513
             Top = 0
             Width = 6
+            Color = clMenuHighlight
             MinSize = 50
+            ParentColor = False
           end
           object PanelBodyVb: TPanel
             Left = 174
-            Height = 587
+            Height = 513
             Top = 0
             Width = 212
             Align = alLeft
@@ -187,18 +270,29 @@ object Frm_main: TFrm_main
             TabOrder = 2
           end
           object Splitter__: TSplitter
+            AnchorSideLeft.Control = PanelBodyVb
             Left = 386
-            Height = 587
+            Height = 513
             Top = 0
             Width = 6
           end
         end
         object PairSplitterSide2: TPairSplitterSide
           Cursor = crArrow
-          Left = 605
-          Height = 587
+          Left = 1005
+          Height = 513
           Top = 0
-          Width = 230
+          Width = 126
+          ClientWidth = 126
+          ClientHeight = 513
+          object Button1: TButton
+            Left = 105
+            Height = 31
+            Top = 151
+            Width = 94
+            Caption = 'Button1'
+            TabOrder = 0
+          end
         end
       end
     end
@@ -208,9 +302,17 @@ object Frm_main: TFrm_main
     Top = 8
     object MenuItemProgram: TMenuItem
       Caption = '&Programma'
+      object MenuItemProgramOpen: TMenuItem
+        Caption = '&Open...'
+        OnClick = MenuItemProgramOpenClick
+      end
       object MenuItemProgramNew: TMenuItem
         Caption = '&Nieuw...'
         OnClick = MenuItemProgramNewClick
+      end
+      object MenuItemProgramCloseDb: TMenuItem
+        Caption = 'Sluiten'
+        OnClick = MenuItemProgramCloseDbClick
       end
       object Separator1: TMenuItem
         Caption = '-'

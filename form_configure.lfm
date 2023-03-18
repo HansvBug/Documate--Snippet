@@ -26,9 +26,9 @@ object Frm_Configure: TFrm_Configure
     Height = 240
     Top = 0
     Width = 749
-    ActivePage = TabSheetAppDatabase
+    ActivePage = TabSheetDivers
     Align = alTop
-    TabIndex = 1
+    TabIndex = 0
     TabOrder = 1
     OnChange = PageControl1Change
     object TabSheetDivers: TTabSheet

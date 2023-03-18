@@ -13,7 +13,9 @@ type
     Id_array     : Integer;  // array index
     Id_table     : Integer;  // item index
     Guid         : String;
+    Level        : Integer;
     Parent_guid  : String;
+    Child_guid   : String;
     Name         : String;
   end;
   AllItemObjectData = array of ItemObjectData;

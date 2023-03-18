@@ -25,6 +25,7 @@ type
       procedure Optimze;
       procedure ResetAutoIncrementAll;
       procedure ResetAutoIncrementTbl(aTblName : String);  // Not used
+      function GetNumberOfColumns : Integer;
   end;
 
 implementation
@@ -218,6 +219,49 @@ begin
     end;
   end;
 end;
+
+function TAppDbMaintain.GetNumberOfColumns: Integer;
+var
+  SqlText : String;
+  Columns : Integer;
+begin
+  SqlText := 'Select VALUE from SETTINGS_META where KEY = :KEY;';
+
+  With DataModule1 do begin
+    try
+      SQLQuery.Close;
+      SQLite3Connection.Close();
+
+      SQLite3Connection.DatabaseName := dbFile;
+      SQLQuery.SQL.Text := SqlText;
+      SQLQuery.Params.ParamByName('KEY').AsString := 'Columns';
+
+      SQLite3Connection.Open;
+      SQLQuery.Open;
+      SQLQuery.First;
+
+      while not SQLQuery.Eof do begin
+        Columns := SQLQuery.FieldByName('VALUE').AsInteger;
+        SQLQuery.next;
+      end;
+      SQLQuery.Close;
+      SQLite3Connection.Close();
+      Result := Columns;
+    except
+      on E : Exception do begin
+        Frm_Main.Logging.WriteToLogError('Fout bij het ophalen van het aantal kolommen.');
+        Frm_Main.Logging.WriteToLogError('Melding:');
+        Frm_Main.Logging.WriteToLogError(E.Message);
+
+        messageDlg('Fout.', 'Fout bij het ophalen van het aantal kolommen.', mtError, [mbOK],0);
+        Result := 0;
+      end;
+    end;
+  end;
+
+end;
+
+
 
 end.
 
