@@ -22,7 +22,7 @@ type
     public
       constructor Create; overload;
       destructor  Destroy; override;
-      property dbFile          : String Read FdbFile Write FdbFile;
+      property dbFile : String Read FdbFile Write FdbFile;
 
     published
   end;

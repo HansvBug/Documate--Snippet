@@ -1,7 +1,7 @@
 object Frm_main: TFrm_main
-  Left = 2300
+  Left = 2328
   Height = 600
-  Top = 271
+  Top = 233
   Width = 1139
   Caption = 'Frm_main'
   ClientHeight = 575
@@ -9,6 +9,7 @@ object Frm_main: TFrm_main
   DesignTimePPI = 120
   Menu = MainMenu1
   OnClose = FormClose
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow
@@ -38,7 +39,7 @@ object Frm_main: TFrm_main
     TabIndex = 0
     TabOrder = 1
     object TabSheet1: TTabSheet
-      Caption = 'TabSheet1'
+      Caption = 'Items'
       ClientHeight = 513
       ClientWidth = 1131
       object PairSplitter2: TPairSplitter
@@ -56,15 +57,52 @@ object Frm_main: TFrm_main
           Width = 900
           ClientWidth = 900
           ClientHeight = 513
-          object ScrollBoxColumns: TScrollBox
+          object PairSplitter3: TPairSplitter
             Left = 0
             Height = 513
             Top = 0
             Width = 900
-            HorzScrollBar.Page = 1
-            VertScrollBar.Page = 1
             Align = alClient
-            TabOrder = 0
+            Position = 200
+            object PairSplitterSide5: TPairSplitterSide
+              Cursor = crArrow
+              Left = 0
+              Height = 513
+              Top = 0
+              Width = 200
+              ClientWidth = 200
+              ClientHeight = 513
+              Constraints.MinWidth = 200
+              object ScrollBoxMainColumn: TScrollBox
+                Left = 0
+                Height = 513
+                Top = 0
+                Width = 200
+                HorzScrollBar.Page = 1
+                VertScrollBar.Page = 1
+                Align = alClient
+                TabOrder = 0
+              end
+            end
+            object PairSplitterSide6: TPairSplitterSide
+              Cursor = crArrow
+              Left = 205
+              Height = 513
+              Top = 0
+              Width = 695
+              ClientWidth = 695
+              ClientHeight = 513
+              object ScrollBoxColumns: TScrollBox
+                Left = 0
+                Height = 513
+                Top = 0
+                Width = 695
+                HorzScrollBar.Page = 1
+                VertScrollBar.Page = 1
+                Align = alClient
+                TabOrder = 0
+              end
+            end
           end
         end
         object PairSplitterSide4: TPairSplitterSide
@@ -236,6 +274,7 @@ object Frm_main: TFrm_main
                   '4'
                 )
                 ItemHeight = 20
+                OnDblClick = ListBox1DblClick
                 TabOrder = 0
               end
               object Button2: TButton
@@ -298,20 +337,24 @@ object Frm_main: TFrm_main
     end
   end
   object MainMenu1: TMainMenu
+    Images = ImageList1
     Left = 456
     Top = 8
     object MenuItemProgram: TMenuItem
       Caption = '&Programma'
       object MenuItemProgramOpen: TMenuItem
         Caption = '&Open...'
+        ImageIndex = 1
         OnClick = MenuItemProgramOpenClick
       end
       object MenuItemProgramNew: TMenuItem
         Caption = '&Nieuw...'
+        ImageIndex = 0
         OnClick = MenuItemProgramNewClick
       end
       object MenuItemProgramCloseDb: TMenuItem
         Caption = 'Sluiten'
+        ImageIndex = 2
         OnClick = MenuItemProgramCloseDbClick
       end
       object Separator1: TMenuItem
@@ -329,5 +372,47 @@ object Frm_main: TFrm_main
         OnClick = MenuItemOptionsConfigureClick
       end
     end
+  end
+  object ImageList1: TImageList
+    Left = 503
+    Top = 137
+    Bitmap = {
+      4C7A030000001000000010000000550400000000000078DAED95694C5C5514C7
+      AF8936B42ED4B4C48450B552DB26D586C6C40FD5849DCEB04EB1D1A60171A1A8
+      69AA9014ACD8B4B5AD56068D5F6C45EC62626DA06AA77428CBB0CCC02C0CB33C
+      1898191898851D0AD402954F62FE9EFB80B034B2247E6A7A935FDE79F79EFFBB
+      E7DE93F30E638CED93C5BE57527C4951AF52DC110C2A58F573F0773ECFD7B91F
+      5B34682ED361A9476FA70D3DAE267473DA8539E89DCFF375A7550BEE3F5FFF46
+      92543ED2E746AB4943A8679E8B999EE77EFBF6C6C917E865D27C47930123FD1E
+      8CF67B314C3EB77B3A3044F0E770AF5B9C1F211C821EDC7FE1FEB1F98DF59574
+      CE1A38CC5AB85B4CE875D930EC6D435F470B3CAD66382D3A3435D4C25CAF02F7
+      9FAF97C684A557298BC5F536FABED76E215D2B467CEDE8EFB4C3EBB0A29DE2B3
+      356AA0295740121D963E5F2F4BD893E7710A685097A1BEE20674AA1208BA6AD8
+      1BEBD04C3119AA94D05797C2A455C14DDF4A4E92E62DD2E737D695C361D5A3CF
+      E3C09D411FC66FF7E0AFD17E8C0FF7E2CFC12E0C789D703737C2AEADC1FE8485
+      F1C749228F1A6A4BC5F89D569D785E7EEE6131FE5674D19E6A4339A445B98853
+      7E81F8B22F11589056C3363FBD8DEB63F74464EB6B4AC1EFC04231BA9A1A30E0
+      B663B4BB0383144FBBCD88578AB31161BD8008E3399128EB45ECF8356B9005F9
+      AF4F888D963B9B1BD04D77C6CFD741FB77D21D72DB6DB722F7C677D8DDF80358
+      65364EBA6E89703BD4540816199C43FA7CD36CFE2C0BF33740F1E75ECFC30643
+      1E168F00831C2C6A8B5C1213FEB9BAE2BA989F36C13097BF2E1706DD0E7C5D76
+      1E4C7302ACEE044E7A5422DC6675A7C022828FD3156C8C0A7FFDCCE9E339FA6B
+      577E9AA82EFD0D6ACAB396F2A8A950A0E266119EBCF8EE14337F8330C7151166
+      FE16AC3075946D58B765260D7EC433C456E2A5FB08F297B1530902FBFD3044B8
+      BDC95F426B8FB2950DEE1748EC982170BEF661FD3FD8F5DFEF71C249B1F13A49
+      4E90ACAAFEF979F8B99A8D6A089A4ABC7C48524BB24766F54BD5FF10EDDB6717
+      E031E9205495A15D578767AFE6801D8EB83AAB5FAAFE7D4E1B76FD7C085B6F7D
+      856D65043DF75BFEC04E6311D8C7E10533FAFFACFF71AF0BAF294F83190A881F
+      A769208C8578B189BE11159CB554FD4FF83AF0BC3217CC7191B8445C066BB900
+      6623149F8EB1E7D6472E55FFFACA9B483F9F0D993C7DE2D5AC443D8B7AE117A6
+      3C02A63C3A46F59B48DA352BAAFFE979BE1EC00A0F4CD1BF37659E7635E33162
+      33B176510D3FACFF07BCFF77B6E8D1622CC79B7BA35755FF3EA705FA5A3D3232
+      CD48FBC48383473C084F32D4AC7B6AE78AFABFABD984B7325AF141EE1876C50F
+      897C786C0CC9EFD806D73EB17DE9FEEFB0E06CBE16199FDD4548DC2842E247A6
+      21FBA36377B131E8ED65FA7F0BCE9C3520F1E0E47DFD3F296312019BD296E9FF
+      767C7FCE88D8B47B90A44D2226751A6E27BC7F8FF429CBF7FF926B08950953A9
+      59FF2025F36F116EEF8EB38CAEF10B5C51FFF77B7CBB2C245421480FF8C0E136
+      DDDDFFD2FFFF05EA7BD10C
+    }
   end
 end

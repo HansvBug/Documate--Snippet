@@ -17,7 +17,7 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
-      <MinorVersionNr Value="2"/>
+      <MinorVersionNr Value="3"/>
       <Attributes pvaDebug="True"/>
       <StringTable Comments="Tool for documenting. (Snippet)" CompanyName="Hans van Buggenum" ProductName="Documate" ProductVersion="1.0.0.0"/>
     </VersionInfo>

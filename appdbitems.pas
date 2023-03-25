@@ -14,11 +14,12 @@ type
     Id_table     : Integer;  // item index
     Guid         : String;
     Level        : Integer;
-    Parent_guid  : String;
+    Parent_guid  : array of String;
     Child_guid   : String;
     Name         : String;
+    Action       : String;
   end;
-  AllItemObjectData = array of ItemObjectData;
+  AllItemsObjectData = array of ItemObjectData;
 
 var
   p : PtrItemObject;

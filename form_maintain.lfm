@@ -7,6 +7,7 @@ object Frm_Maintain: TFrm_Maintain
   ClientHeight = 138
   ClientWidth = 475
   DesignTimePPI = 120
+  OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnShow = FormShow

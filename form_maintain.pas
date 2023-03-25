@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  AppDbItems, Visual, SettingsManager, AppDbMaintainComponents;
+  AppDbItems, Visual, SettingsManager, AppDbMaintainComponents,
+  form_Main;
 
 type
 
@@ -24,6 +25,7 @@ type
     procedure ComboBoxNewItemChange(Sender: TObject);
     procedure ComboBoxNewItemEnter(Sender: TObject);
     procedure ComboBoxNewItemExit(Sender: TObject);
+    procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
@@ -36,7 +38,7 @@ type
 
     procedure CheckEntryLength(Sender: TObject; aLength : Integer);
   public
-    NewItemObjectData: AllItemObjectData;
+    NewItemObjectData: AllItemsObjectData;
     property CurrLevel : Integer read FCurrLevel write FCurrLevel;
     property CurrGuid : String read FCurrGuid write FCurrGuid;
 
@@ -102,6 +104,17 @@ begin
   end;
 end;
 
+procedure TFrm_Maintain.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
+var
+  i : Integer;
+begin
+  for i := Length(NewItemObjectData)-1 downto 0 do begin
+    if NewItemObjectData[i].Action <> 'Insert' then begin
+      delete(NewItemObjectData, i, 1);
+    end;
+  end;
+end;
+
 procedure TFrm_Maintain.ButtonCloseClick(Sender: TObject);
 begin
   Close;
@@ -109,7 +122,7 @@ end;
 
 procedure TFrm_Maintain.ComboBoxNewItemChange(Sender: TObject);
 begin
-  CheckEntryLength(Sender, 255);  // 255 zal per veld gaan verschillen
+  CheckEntryLength(Sender, 1000);
 end;
 
 procedure TFrm_Maintain.ComboBoxNewItemEnter(Sender: TObject);
@@ -120,28 +133,81 @@ begin
 end;
 
 procedure TFrm_Maintain.ButtonAddItemClick(Sender: TObject);
+var
+  i : Integer;
+  isNew : Boolean;
 begin
   if ComboBoxNewItem.Text <> '' then begin
-    SetLength(NewItemObjectData, FCounter);
-    NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
-    NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
-    NewItemObjectData[FCounter-1].Level := CurrLevel;
-    NewItemObjectData[FCounter-1].Parent_guid := CurrGuid;
-    NewItemObjectData[FCounter-1].Child_guid := NewItemObjectData[FCounter-1].Guid;
-    Close;
+    isNew := True;
+    // Eerst zoeken of een item al bestaat
+    for i := 0 to Length(NewItemObjectData)-1 do begin
+      if NewItemObjectData[i].Name = ComboBoxNewItem.Text then begin
+
+        if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Nieuw item aan de array toevoegen. (ButtonAddItemClick)/');
+        NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
+        NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
+        NewItemObjectData[FCounter-1].Level := CurrLevel;
+        SetLength(NewItemObjectData[FCounter-1].Parent_guid, 1);
+        NewItemObjectData[FCounter-1].Parent_guid[0] := CurrGuid;  // Alway the first (and only) item in the array
+        NewItemObjectData[FCounter-1].Child_guid := NewItemObjectData[i].Child_guid;
+        NewItemObjectData[FCounter-1].Action := 'Insert';
+        Inc(FCounter);
+        isNew := False;
+      end;
+    end;
+
+    if isNew then begin
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Nieuw item aan de array toevoegen. (ButtonAddItemClick)/');
+      SetLength(NewItemObjectData, FCounter);
+      NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
+      NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
+      NewItemObjectData[FCounter-1].Level := CurrLevel;
+      SetLength(NewItemObjectData[FCounter-1].Parent_guid, 1);
+      NewItemObjectData[FCounter-1].Parent_guid[0] := CurrGuid;
+      NewItemObjectData[FCounter-1].Child_guid := NewItemObjectData[FCounter-1].Guid;
+      NewItemObjectData[FCounter-1].Action := 'Insert';
+      Inc(FCounter);
+    end;
   end;
+
+  // in FormCloseQuery  the items where action <> "Insert' get deleted
+  Close;
 end;
 
 procedure TFrm_Maintain.ButtonAddNextItemClick(Sender: TObject);
+var
+  i : Integer;
+  isNew : Boolean;
 begin
   if ComboBoxNewItem.Text <> '' then begin
-    SetLength(NewItemObjectData, FCounter);
-    NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
-    NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
-    NewItemObjectData[FCounter-1].Level := CurrLevel;
-    NewItemObjectData[FCounter-1].Parent_guid := CurrGuid;
-    NewItemObjectData[FCounter-1].Child_guid := NewItemObjectData[FCounter-1].Guid;
-    Inc(FCounter);
+    isNew := True;
+    for i := 0 to Length(NewItemObjectData)-1 do begin
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Volgend nieuw item aan de array toevoegen. (ButtonAddNextItemClick)/');
+      if NewItemObjectData[i].Name = ComboBoxNewItem.Text then begin
+        NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
+        NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
+        NewItemObjectData[FCounter-1].Level := CurrLevel;
+        SetLength(NewItemObjectData[FCounter-1].Parent_guid, 1);
+        NewItemObjectData[FCounter-1].Parent_guid[0] := CurrGuid;
+        NewItemObjectData[FCounter-1].Child_guid := NewItemObjectData[i].Child_guid;
+        NewItemObjectData[FCounter-1].Action := 'Insert';
+        Inc(FCounter);
+        isNew := False;
+      end;
+    end;
+
+    if isNew then begin
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Volgend nieuw item aan de array toevoegen. (ButtonAddNextItemClick)/');
+      SetLength(NewItemObjectData, FCounter);
+      NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
+      NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
+      NewItemObjectData[FCounter-1].Level := CurrLevel;
+      SetLength(NewItemObjectData[FCounter-1].Parent_guid, 1);
+      NewItemObjectData[FCounter-1].Parent_guid[0] := CurrGuid;
+      NewItemObjectData[FCounter-1].Child_guid := NewItemObjectData[FCounter-1].Guid;
+      NewItemObjectData[FCounter-1].Action := 'Insert';
+      Inc(FCounter);
+    end;
 
     ComboBoxNewItem.Text := '';
     ComboBoxNewItem.SetFocus;

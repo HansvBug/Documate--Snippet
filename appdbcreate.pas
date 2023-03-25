@@ -300,7 +300,6 @@ begin
   if not result then CloseHandle(HFileRes);
 end;
 
-
 function TCreateAppdatabase.SelectMeta: Integer;
 var
   SqlString : String;

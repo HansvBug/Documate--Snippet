@@ -34,7 +34,8 @@ type
       function CreateEdit(aName : String; aParent : TWinControl) : TEdit;
       function CreateLabel(aName : String; aParent : TWinControl) : TLabel;
       function CreateListBox(aName : String; aParent : TWinControl) : TListBox;
-      function CreateButton(aName : String; aParent : TWinControl) : TButton;
+      function CreateButtonNew(aName : String; aParent : TWinControl) : TButton;
+      function CreateButtonNext(aName : String; aParent : TWinControl) : TButton;
 
       procedure SetArrays;
       //procedure PanelClick(Sender: TObject);
@@ -50,6 +51,7 @@ type
       procedure BuildListBoxes;
       procedure BuildEdit;
       procedure BuildButtons(aCaption : String);
+      procedure BuildLabel;
 
       property NumberOfColumns : Byte read FColumns write FColumns;
   end;
@@ -83,6 +85,9 @@ begin
     if mainForm.Components[i] is TButton then begin
       _button :=  TButton(mainForm.Components[i]);
       if Pos('ButtonNew_' , _button.Name) > 0 then begin
+        _button.Free;
+      end
+      else if Pos('ButtonNext_' , _button.Name) > 0 then begin
         _button.Free;
       end;
     end;
@@ -151,6 +156,15 @@ begin
     end;
   end;
 
+  for i := mainForm.ComponentCount -1 downto 0 do begin
+    if mainForm.Components[i] is TLabel then begin
+      _label :=  TLabel(mainForm.Components[i]);
+      if Pos('LabelSearchResult_' , _label.Name) > 0 then begin
+        _label.Free;
+      end;
+    end;
+  end;
+
 end;
 
 function TBuildComponent.CreatePanel(aName: String; aParent : TWinControl; aWidth : Integer): TPanel;
@@ -164,7 +178,6 @@ begin
                        //https://forum.lazarus.freepascal.org/index.php?action=post;topic=62608.0;last_msg=473575
   result := _panel;
 end;
-
 
 function TBuildComponent.CreateSplitter(aName: String; aParent: TWinControl
   ): TSplitter;
@@ -185,6 +198,7 @@ begin
   _edit.Name := aName;
   _edit.Height := 28;  // Default height
   _edit.Width := 100;  // Default with;
+  _edit.OnChange := @Form_Main.Frm_main.EditOnChange; //
   result := _edit;
 end;
 
@@ -204,10 +218,11 @@ begin
   _listbox.Parent := aParent;
   _listbox.Name := aName;
   _listbox.OnClick := @Form_Main.Frm_main.ListBoxOnClick;
+  _listBox.OnSelectionChange := @Form_Main.Frm_main.ListBoxOnSelectionChange;
   result := _listbox;
 end;
 
-function TBuildComponent.CreateButton(aName: String; aParent: TWinControl
+function TBuildComponent.CreateButtonNew(aName: String; aParent: TWinControl
   ): TButton;
 begin
   _button := TButton.Create(mainForm);
@@ -219,26 +234,46 @@ begin
   result := _button;
 end;
 
+function TBuildComponent.CreateButtonNext(aName: String; aParent: TWinControl
+  ): TButton;
+begin
+  _button := TButton.Create(mainForm);
+  _button.Parent := aParent;
+  _button.Name := aName;
+  _button.Height := 31;  // Default height
+  _button.Width := 10;   // modified
+  _button.Caption := 'Volgende';
+  _button.OnClick :=  @Form_Main.Frm_main.ButtonNextOnClick; //
+  result := _button;
+end;
+
 procedure TBuildComponent.BuildBodyPanelsAndSplitters(aParent: TWinControl);
 var
   i : Integer;
 begin
   SetArrays;
 
-  for i := 1 to NumberOfColumns do begin
-    allPanels[i-1] := CreatePanel('PanelBody_' + IntToStr(i), aParent, 200);
-    allPanels[i-1].AnchorSide[akLeft].Control := aParent;
-    allPanels[i-1].Align := alLeft;
-    allPanels[i-1].BevelOuter := bvNone;
+  if aParent.Name =  'ScrollBoxMainColumn' then begin
+    allPanels[0] := CreatePanel('PanelBody_' + IntToStr(1), aParent, 200);
+    allPanels[0].Align := alClient;
+    allPanels[0].BevelOuter := bvNone;
+  end
+  else if aParent.Name =  'ScrollBoxColumns' then begin
+    for i := 2 to NumberOfColumns do begin
+      allPanels[i-1] := CreatePanel('PanelBody_' + IntToStr(i), aParent, 200);
+      allPanels[i-1].AnchorSide[akLeft].Control := aParent;
+      allPanels[i-1].Align := alLeft;
+      allPanels[i-1].BevelOuter := bvNone;
 
-    if i = NumberOfColumns then begin // build 1 splitter less and align the last panel allClient
-      allPanels[i-1].Align := alClient;
-      break;
+      if i = NumberOfColumns then begin // build 1 splitter less and align the last panel allClient
+        allPanels[i-1].Align := alClient;
+        break;
+      end;
+
+      allSplitters[i-1] := CreateSplitter('Splitter_' + IntToStr(i), aParent);
+      allSplitters[i-1].Align := alLeft;
+      allSplitters[i-1].AnchorSide[akLeft].Control := allPanels[i-1];
     end;
-
-    allSplitters[i-1] := CreateSplitter('Splitter_' + IntToStr(i), aParent);
-    allSplitters[i-1].Align := alLeft;
-    allSplitters[i-1].AnchorSide[akLeft].Control := allPanels[i-1];
   end;
 end;
 
@@ -254,7 +289,8 @@ begin
       newPanels[newPanelNumber-1] := CreatePanel('PanelHeader_' + IntToStr(newPanelNumber), allPanels[i], 50);
 
       newPanels[newPanelNumber-1].Align := alTop;
-      newPanels[newPanelNumber-1].Caption := 'PanelHeader_'+ IntToStr(newPanelNumber);
+      // newPanels[newPanelNumber-1].Caption := 'PanelHeader_'+ IntToStr(newPanelNumber);
+      newPanels[newPanelNumber-1].Caption := '';
       inc(newPanelNumber);
     end;
   end;
@@ -282,7 +318,8 @@ begin
       SetLength(newPanels, newPanelNumber);
       newPanels[newPanelNumber-1] := CreatePanel('PanelSearch_' + IntToStr(newPanelNumber), allPanels[i], 50);
       newPanels[newPanelNumber-1].Align := alBottom;
-      newPanels[newPanelNumber-1].Caption := 'Search '+ IntToStr(newPanelNumber);
+      // newPanels[newPanelNumber-1].Caption := 'Search '+ IntToStr(newPanelNumber);
+      newPanels[newPanelNumber-1].Caption := '';
       inc(newPanelNumber);
     end;
   end;
@@ -308,7 +345,8 @@ begin
       SetLength({%H-}newPanels, newPanelNumber);{%H+}
       newPanels[newPanelNumber-1] := CreatePanel('PanelData_' + IntToStr(newPanelNumber), allPanels[i], 50);
       newPanels[newPanelNumber-1].Align := alClient;
-      newPanels[newPanelNumber-1].Caption := 'PanelData_ '+ IntToStr(newPanelNumber);
+      // newPanels[newPanelNumber-1].Caption := 'PanelData_ '+ IntToStr(newPanelNumber);
+      newPanels[newPanelNumber-1].Caption := '';
       inc(newPanelNumber);
     end;
   end;
@@ -357,6 +395,9 @@ begin
       newEditboxes[newEditbox-1] := CreateEdit('EditSearch_' + IntToStr(newEditbox), allPanels[i]);
       newEditboxes[newEditbox-1].Left := 8;
       newEditboxes[newEditbox-1].Top := 16;
+      newEditboxes[newEditbox-1].Text := '';
+      newEditboxes[newEditbox-1].TextHint := 'Zoek item';  { #todo : Optioneel maken }
+      newEditboxes[newEditbox-1].Anchors := [TAnchorKind.akLeft, TAnchorKind.akRight];
       Inc(newEditbox);
     end;
   end;
@@ -367,18 +408,58 @@ var
   newButtons : array of TButton = nil;
   i, newButton : Integer;
 begin
-  newButton := 1;
-  for i := 0 to Length(allPanels)-1 do begin
-    if Pos('PanelHeader_', allpanels[i].Name) > 0 then begin
-      SetLength(newButtons, newButton);
-      newButtons[newButton-1] := CreateButton('ButtonNew_' + IntToStr(newButton), allPanels[i]);
-      newButtons[newButton-1].Left := 8;
-      newButtons[newButton-1].Top := 16;
-      newButtons[newButton-1].Name := 'ButtonNew_' + IntToStr(newButton);
-      newButtons[newButton-1].Caption := aCaption;
-      Inc(newButton);
+  if aCaption = 'New' then begin
+    newButton := 1;
+    for i := 0 to Length(allPanels)-1 do begin
+      if Pos('PanelHeader_', allpanels[i].Name) > 0 then begin
+        SetLength(newButtons, newButton);
+        newButtons[newButton-1] := CreateButtonNew('ButtonNew_' + IntToStr(newButton), allPanels[i]);
+        newButtons[newButton-1].Left := 8;
+        newButtons[newButton-1].Top := 16;
+        newButtons[newButton-1].Name := 'ButtonNew_' + IntToStr(newButton);
+        newButtons[newButton-1].Caption := aCaption;
+        Inc(newButton);
+      end;
+    end;
+  end
+  else if aCaption = 'Next' then begin
+    newButton := 1;
+    newButtons := nil;
+    for i := 0 to Length(allPanels)-1 do begin
+      if Pos('PanelSearch_', allpanels[i].Name) > 0 then begin
+        SetLength(newButtons, newButton);
+        newButtons[newButton-1] := CreateButtonNext('ButtonNext_' + IntToStr(newButton), allPanels[i]);
+        newButtons[newButton-1].Left := 160;
+        newButtons[newButton-1].Top := 16;
+        newButtons[newButton-1].Width := 30;
+        newButtons[newButton-1].Height := 28;
+        newButtons[newButton-1].Name := 'ButtonNext_' + IntToStr(newButton);
+        newButtons[newButton-1].Caption := '>';
+        newButtons[newButton-1].Anchors := [TAnchorKind.akRight];
+        Inc(newButton);
+      end;
     end;
   end;
+end;
+
+procedure TBuildComponent.BuildLabel;
+var
+  newlabels : array of TLAbel = nil;
+  i, newLabel : Integer;
+begin
+  newLabel := 1;
+  for i := 0 to Length(allPanels)-1 do begin
+    if Pos('PanelSearch_', allpanels[i].Name) > 0 then begin
+      SetLength(newlabels, newLabel);
+      newlabels[newLabel-1] := CreateLabel('LabelSearchResult_' + IntToStr(newLabel), allPanels[i]);
+      newlabels[newLabel-1].Left := 140;
+      newlabels[newLabel-1].Top := 16;
+      newlabels[newLabel-1].Caption := 'st';
+      newlabels[newLabel-1].Anchors := [TAnchorKind.akRight];
+      Inc(newLabel);
+    end;
+  end;
+
 end;
 
 
