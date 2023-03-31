@@ -20,6 +20,7 @@ type
       FSetActiveBackGround : Boolean;
       FFileCopyCount, FFileCopyCurrent : Byte;
 
+
       procedure ReadSettings;
       procedure GetConfigurationFileLocation;
 

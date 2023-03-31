@@ -18,6 +18,8 @@ type
       arrayCounter : Integer;
 
       function GetNumbers(const Value: string): String;
+      procedure DeleteItemSelf(Guid : String);
+      function DeleteItemRel(Guid : String; level : Integer) : Boolean;
 
     public
       AllItems : AllItemsObjectData;
@@ -27,10 +29,17 @@ type
       destructor  Destroy; override;
       procedure InsertNewItem(NewItems: AllItemsObjectData);
       procedure InsertRelation(NewItems: AllItemsObjectData);
+      procedure updateRelation(NewItems: AllItemsObjectData);
+      procedure UpdateItem(NewItems: AllItemsObjectData);
       procedure GetAllItems(aListBox : TListBox; level : Byte);
       Procedure ReadLevel(level: Byte);
       Procedure RelateItem;
       procedure PopulateListbox;
+      function DoesItemNameExists(aName : String; aLevel : Integer) : Boolean;
+      procedure DeleteItem(Guid : String; level : Integer);
+      procedure DeleteItemRel(Guid, parentGuid : String; level : Integer);
+
+
   end;
 
 
@@ -168,6 +177,55 @@ begin
         end;
       end;
     end;
+  end;
+end;
+
+procedure TAppDbMaintainComponents.updateRelation(NewItems: AllItemsObjectData);
+begin
+  // parent guid ophalen
+
+end;
+
+procedure TAppDbMaintainComponents.UpdateItem(NewItems: AllItemsObjectData);
+var
+  SqlText : String;
+begin
+  SqlText := 'update '+ ITEMS;
+  SqlText += ' set NAME = :NAME';
+  SqlText += ' where GUID = :GUID';
+  SqlText += ' and LEVEL = :LEVEL';
+
+  try
+    if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Naam bestaand item wordt aangepast.');
+
+    With DataModule1 do begin
+      SQLQuery.Close;
+      SQLite3Connection.Close();
+      SQLite3Connection.DatabaseName := dbFile;
+
+      SQLQuery.SQL.Text := SqlText;
+
+      SQLQuery.Params.ParamByName('GUID').AsString := NewItems[0].Guid;
+      SQLQuery.Params.ParamByName('NAME').AsString := NewItems[0].Name;// MOET ANDERS
+      SQLQuery.Params.ParamByName('LEVEL').AsInteger := NewItems[0].Level;
+
+      SQLite3Connection.Open;
+      SQLTransaction.Active:=True;
+
+      SQLQuery.ExecSQL;
+
+      SQLTransaction.Commit;
+      SQLite3Connection.Close();
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Item is hernoemd.');
+    end;
+  except
+    on E: EDatabaseError do
+      begin
+        Frm_Main.Logging.WriteToLogInfo('Het hernoemen van een bestaand item is mislukt.');
+        Frm_Main.Logging.WriteToLogError('Melding:');
+        Frm_Main.Logging.WriteToLogError(E.Message);
+        messageDlg('Fout.', 'Het hernoemen van een bestaand item is mislukt.', mtError, [mbOK],0);
+      end;
   end;
 end;
 
@@ -312,6 +370,7 @@ begin
 
     if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Gegevens in de listboxen zetten. (PopulateListbox).');
     // clear the listboxes pointer objects.
+    curListBox.Items.BeginUpdate;
     if curListBox.Items.Count > 0 then begin
       for i := 0 to curListBox.Items.Count -1 do begin
         Dispose(PtrItemObject(curListBox.Items.Objects[I]));
@@ -333,7 +392,204 @@ begin
         curListBox.AddItem(AllItems[i].Name, TObject(pItem));
       end;
     end;
+    curListBox.Items.EndUpdate;
     Screen.Cursor := crDefault;
+  end;
+end;
+
+function TAppDbMaintainComponents.DoesItemNameExists(aName: String; aLevel : Integer): Boolean;
+var
+  SqlText : String;
+begin
+  SqlText := 'select NAME ';
+  SqlText += 'from '+ ITEMS;
+  SqlText += ' where NAME = :NAME';
+  SqlText += ' and LEVEL = :LEVEL';
+
+  With DataModule1 do begin
+    try
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Start DoesItemExists.');
+      SQLQuery.Close;
+      SQLite3Connection.Close();
+
+      SQLite3Connection.DatabaseName := dbFile;
+      SQLite3Connection.Open;
+
+      SQLQuery.PacketRecords := -1;
+      SQLQuery.SQL.Text := SqlText;
+
+      SQLQuery.Params.ParamByName('NAME').AsString := aName;
+      SQLQuery.Params.ParamByName('LEVEL').AsInteger := aLevel;
+
+      if SQLQuery.RecordCount > 0 then begin
+        Result := True;
+      end
+      else begin
+        Result := False;
+      end;
+
+      SQLQuery.Close;
+      SQLite3Connection.Close();
+    except
+      on E : Exception do begin
+        Frm_Main.Logging.WriteToLogError('Fout bij het opvragen van alle itemnamen. (tabel :' + ITEMS + ').');
+        Frm_Main.Logging.WriteToLogError('Melding:');
+        Frm_Main.Logging.WriteToLogError(E.Message);
+
+        messageDlg('Fout.', 'Fout bij het lezen van de onderdelen.', mtError, [mbOK],0);
+      end;
+    end;
+  end;
+end;
+
+procedure TAppDbMaintainComponents.DeleteItem(Guid: String; level : Integer);
+begin
+  if DeleteItemRel(Guid, level) then
+    DeleteItemSelf(Guid)
+  else
+    messageDlg('Fout.', 'Item is niet verwijderd.', mtError, [mbOK],0);
+end;
+
+procedure TAppDbMaintainComponents.DeleteItemRel(Guid, parentGuid : String; level : Integer);
+var
+  SqlText : String;
+begin
+  SqlText := 'delete from ' + REL_ITEMS;
+  if level > 1 then begin
+    SqlText += ' where GUID_LEVEL_B = :GUID';
+    SqlText += ' and GUID_LEVEL_A = :PARENT_GUID';
+  end
+  else begin
+    SqlText += ' where GUID_LEVEL_A = :GUID';
+  end;
+
+  With DataModule1 do begin
+    try
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Start DeleteItemRel.');
+      SQLQuery.Close;
+      SQLite3Connection.Close();
+
+      SQLite3Connection.DatabaseName := dbFile;
+      SQLite3Connection.Open;
+
+      SQLQuery.SQL.Text := SqlText;
+
+      SQLQuery.Params.ParamByName('GUID').AsString := Guid;
+      SQLQuery.Params.ParamByName('PARENT_GUID').AsString := parentGuid;
+
+      SQLite3Connection.Open;
+      SQLTransaction.Active:=True;
+
+      SQLQuery.ExecSQL;
+
+      SQLTransaction.Commit;
+      SQLite3Connection.Close();
+
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Relatie naar item is verwijderd.');
+
+      ReadLevel(level);
+      RelateItem;
+      curListBox := curListBox;
+      PopulateListbox;
+    except
+      on E : Exception do begin
+        Frm_Main.Logging.WriteToLogError('Fout bij het verwijderen van een relatie naar een item.');
+        Frm_Main.Logging.WriteToLogError('Melding:');
+        Frm_Main.Logging.WriteToLogError(E.Message);
+
+        messageDlg('Fout.', 'Fout bij het verwijderen van een relatie naar item.', mtError, [mbOK],0);
+      end;
+    end;
+  end;
+end;
+
+function TAppDbMaintainComponents.DeleteItemRel(Guid: String; level : Integer) : Boolean;
+var
+  SqlText : String;
+begin
+  SqlText := 'delete from ' + REL_ITEMS;
+  if level > 1 then begin
+    SqlText += ' where GUID_LEVEL_B = :GUID';
+  end
+  else begin
+    SqlText += ' where GUID_LEVEL_A = :GUID';
+  end;
+
+  With DataModule1 do begin
+    try
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Start DeleteItemRel.');
+      SQLQuery.Close;
+      SQLite3Connection.Close();
+
+      SQLite3Connection.DatabaseName := dbFile;
+      SQLite3Connection.Open;
+
+      SQLQuery.SQL.Text := SqlText;
+
+      SQLQuery.Params.ParamByName('GUID').AsString := Guid;
+
+      SQLite3Connection.Open;
+      SQLTransaction.Active:=True;
+
+      SQLQuery.ExecSQL;
+
+      SQLTransaction.Commit;
+      SQLite3Connection.Close();
+
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Relatie naar item is verwijderd.');
+
+      result := True;
+    except
+      on E : Exception do begin
+        Frm_Main.Logging.WriteToLogError('Fout bij het verwijderen van een relatie naar een item.');
+        Frm_Main.Logging.WriteToLogError('Melding:');
+        Frm_Main.Logging.WriteToLogError(E.Message);
+
+        messageDlg('Fout.', 'Fout bij het verwijderen van een relatie naar item.', mtError, [mbOK],0);
+        Result := False;
+      end;
+    end;
+  end;
+end;
+
+procedure TAppDbMaintainComponents.DeleteItemSelf(Guid: String);
+var
+  SqlText : String;
+begin
+  SqlText := 'delete from ' + ITEMS;
+  SqlText += ' where GUID = :GUID';
+
+  With DataModule1 do begin
+    try
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Start DeleteItemSelf.');
+      SQLQuery.Close;
+      SQLite3Connection.Close();
+
+      SQLite3Connection.DatabaseName := dbFile;
+      SQLite3Connection.Open;
+
+      SQLQuery.SQL.Text := SqlText;
+
+      SQLQuery.Params.ParamByName('GUID').AsString := Guid;
+
+      SQLite3Connection.Open;
+      SQLTransaction.Active:=True;
+
+      SQLQuery.ExecSQL;
+
+      SQLTransaction.Commit;
+      SQLite3Connection.Close();
+
+      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Item is verwijderd.');
+    except
+      on E : Exception do begin
+        Frm_Main.Logging.WriteToLogError('Fout bij het verwijderen van een item.');
+        Frm_Main.Logging.WriteToLogError('Melding:');
+        Frm_Main.Logging.WriteToLogError(E.Message);
+
+        messageDlg('Fout.', 'Fout bij het verwijderen van een item.', mtError, [mbOK],0);
+      end;
+    end;
   end;
 end;
 

@@ -1,7 +1,7 @@
 object Frm_Configure: TFrm_Configure
-  Left = 2606
+  Left = 2916
   Height = 288
-  Top = 169
+  Top = 199
   Width = 749
   Caption = 'Frm_Configure'
   ClientHeight = 288

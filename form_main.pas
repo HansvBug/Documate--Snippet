@@ -6,7 +6,7 @@ interface
 
 uses
   Windows, Classes, Messages, SysUtils, Forms, Controls, Graphics, Dialogs, Menus, ComCtrls,
-  StdCtrls, ExtCtrls, PairSplitter, LCLType,
+  StdCtrls, ExtCtrls, PairSplitter, LCLType, lcltranslator,
   AppDbItems, Settings, Settingsmanager, Logging, Visual, Form_Configure,
   AppDbMaintain, AppDbMaintainComponents;
 
@@ -20,6 +20,7 @@ type
   TFrm_main = class(TForm)
     Button1: TButton;
     Button2: TButton;
+    ComboBox1: TComboBox;
     Edit1: TEdit;
     Edit2: TEdit;
     Edit3: TEdit;
@@ -35,6 +36,17 @@ type
     MainMenu1: TMainMenu;
     Memo1: TMemo;
     MenuItem1: TMenuItem;
+    MenuItemBreakReletion: TMenuItem;
+    Separator3: TMenuItem;
+    MenuItemDelete: TMenuItem;
+    MenuItemModify: TMenuItem;
+    MenuItemInsert: TMenuItem;
+    MenuItemOptionsAbout: TMenuItem;
+    PopupMenu1: TPopupMenu;
+    Separator2: TMenuItem;
+    MenuItemOptionsLanguageEn: TMenuItem;
+    MenuItemOptionsLanguageNl: TMenuItem;
+    MenuItemOptionsLanguage: TMenuItem;
     MenuItemProgramCloseDb: TMenuItem;
     MenuItemProgramOpen: TMenuItem;
     MenuItemOptionsConfigure: TMenuItem;
@@ -71,7 +83,13 @@ type
     procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
     procedure ListBox1DblClick(Sender: TObject);
+    procedure MenuItemBreakReletionClick(Sender: TObject);
+    procedure MenuItemDeleteClick(Sender: TObject);
+    procedure MenuItemInsertClick(Sender: TObject);
+    procedure MenuItemModifyClick(Sender: TObject);
     procedure MenuItemOptionsConfigureClick(Sender: TObject);
+    procedure MenuItemOptionsLanguageEnClick(Sender: TObject);
+    procedure MenuItemOptionsLanguageNlClick(Sender: TObject);
     procedure MenuItemProgramCloseClick(Sender: TObject);
     procedure MenuItemProgramCloseDbClick(Sender: TObject);
     procedure MenuItemProgramNewClick(Sender: TObject);
@@ -80,14 +98,18 @@ type
 
 
   private
-    FCurrListBox : TListBox;
-    FCurrGuid : String;  // The guid of the selected listbox item
-    FColumns : Byte;
-    FDisableAppItems, FDbDescriptionShort : String;
-    FDbFile : String;
-    FCanContinue, FFormOpen : Boolean;
-    FFoundItems: Array of Integer;
-    FArrayPosition, FListBoxMaxItemIndex, FSelectedLb1Item: Integer;
+    FCurrListBox         : TListBox;          // Current Listbox. The active listbox.
+    FCurrGuid            : String;            // The guid of the selected listbox item.
+    FColumns             : Byte;              // Field of property NumberOfColumns.
+    FDisableAppItems     : String;            // Field of property DisableAppItems.  // Not used yet
+    FDbFile              : String;            // Location database file.
+    FDbDescriptionShort  : String;            // Field of property DbDescriptionShort. Holds the database description when create new db file.
+    FCanContinue         : Boolean;           // Property of CanContinue. Can the application continue.
+    FFormOpen            : Boolean;           // Used for 'new item form'.
+    FFoundItems          : Array of Integer;  // Holds the index of the listbox items.
+    FArrayPosition       : Integer;           // Used for search next listbox item.
+    FSelLb1ItemIndex     : Integer;          // Holds the index of the selected listbox1 item.
+    FSelLbItemIndex      : Integer;          // Holds the index of the selected listbox1 item.
 
     AllComponents : TAppDbMaintainComponents;
 
@@ -102,7 +124,7 @@ type
     procedure CreateOwnComponents;
     procedure DisableAllButtons;
     procedure EnableButtons(BtnNumber : Integer);
-    procedure HideComponents(Component : TWinControl);
+    procedure HideComponents(ControleType : String);
     function GetNumbers(const Value: string): String;
     function GetTheRightListBox(identifier: Byte) : TListBox;
     function GetTheRightLabel(identifier: Byte) : TLabel;
@@ -114,11 +136,13 @@ type
     procedure RemoveListBoxObjects;
 
     // test muteren listbox tabblad 2
-    procedure EditDone(Sender: TObject);
-    procedure EditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
-    procedure EditMouseDown(Sender: TObject; {%H-}Button: TMouseButton;
+    procedure ComboBoxDone(Sender: TObject);
+    procedure ComboBoxKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState);
+    procedure ComboBoxMouseDown(Sender: TObject; {%H-}Button: TMouseButton;
                             {%H-}Shift: TShiftState; X, Y: Integer);
-    procedure UmDestroyControl(var msg: TMessage); message UM_DESTROYCONTROL;
+    procedure ComboBoxUmDestroyControl(var msg: TMessage); message UM_DESTROYCONTROL;
+
+    property DisableAppItems : string read FDisableAppItems write FDisableAppItems;
 
   public
     FDebug : Boolean;
@@ -128,16 +152,21 @@ type
 
     procedure ButtonNewOnClick(Sender: TObject);
     procedure ButtonNextOnClick(Sender: TObject);
-    procedure ListBoxOnClick(Sender: TObject);
-    procedure ListBoxOnSelectionChange(Sender: TObject; User: boolean);
-    procedure EditOnChange(Sender: TObject);
 
+    procedure ListBoxOnClick(Sender: TObject);
+    procedure ListBoxOnDblClick(Sender: TObject);
+    procedure ListBoxOnSelectionChange(Sender: TObject; User: boolean);
+    procedure ListBoxOnMouseDown(Sender: TObject; Button: TMouseButton;
+              Shift: TShiftState; X, Y: Integer);
+    procedure ListBoxOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+
+    procedure EditOnChange(Sender: TObject);
     function ListBoxSearchItem(Listbox : TListBox; SearchText : String) : Integer;
+    procedure DelteItem;
 
     property NumberOfColumns : Byte read FColumns write FColumns;
     property DbDescriptionShort : String read FDbDescriptionShort write FDbDescriptionShort;
     property CanContinue : Boolean read FCanContinue write FCanContinue;
-    property DisableAppItems : string read FDisableAppItems write FDisableAppItems;
 
   end;
 
@@ -149,8 +178,8 @@ var
 
 implementation
 
-uses ApplicationEnvironment, AppDbCreate, form_new_db_config, BuildComponents, Form_Maintain
-  ;
+uses ApplicationEnvironment, AppDbCreate, form_new_db_config, BuildComponents,
+  Form_Maintain;
 
 
 
@@ -197,6 +226,7 @@ end;
 
 procedure TFrm_main.Button2Click(Sender: TObject);
 begin
+  // page 2 test button
   ListBox1.ClearSelection;
   ListBox1.Selected[0] := True;
 end;
@@ -206,6 +236,7 @@ begin
   Caption := Settings.ApplicationName;
   CheckAppEnvironment;
   ReadSettings;
+  SetDefaultLang(SetMan.DefaultLanguage);
   StartLogging;
   FormInitialize;
   FDebug := True;  // tmp
@@ -226,58 +257,112 @@ begin
 end;
 
 procedure TFrm_main.ListBox1DblClick(Sender: TObject);
-var
-  r: TRect;
-  lb: TListBox;
-  ed: TEdit;
 begin
-  lb := Sender as TListbox;
-  if lb.ItemIndex < 0 then Exit;
-  ed := Tedit.Create(self);
-  ed.Font.Size := 9;
-  r := lb.ItemRect(lb.itemindex);
-  r.topleft := lb.ClientToScreen(r.topleft);
-  r.BottomRight := lb.clienttoscreen(r.bottomright);
-  r.topleft := ScreenToClient(r.topleft);
-  r.BottomRight := screenToClient(r.bottomright);
-  ed.text := lb.Items[lb.itemindex];
-  ed.setbounds(r.left, r.top-2, lb.clientwidth, r.bottom - r.top + 4);
-  ed.OnExit := @EditDone;
-  ed.OnMouseDown:= @EditMouseDown;
-  ed.OnKeyUp := @EditKeyUp;
-  ed.Parent := Self;
-  SetCapturecontrol(ed);
-  ed.SetFocus;
+  ListBoxOnDblClick(Sender);
 end;
 
-procedure TFrm_main.EditDone(Sender: TObject);
+procedure TFrm_main.MenuItemBreakReletionClick(Sender: TObject);
+var
+  Guid, parentGuid, itemName  : String;
+
+  buttonSelected, Level : Integer;
+  appDbMaintain : TAppDbMaintainComponents;
+  _listBox : TListBox;
 begin
-  (Sender as TEdit).OnExit := nil; // sometimes this method is called twice, this is to prevent this
-  ListBox1.Items[ListBox1.itemindex] := (Sender As TEdit).Text;
+  itemName := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Name;
+  buttonSelected := MessageDlg('Wilt u de relatie naar "' + itemName + '" verwijderen?' ,mtConfirmation, [mbYes,mbCancel], 0);
+  if buttonSelected = mrYes    then begin
+    Guid := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Guid;
+    Level := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Level;
+    appDbMaintain := TAppDbMaintainComponents.Create;
+    appDbMaintain.dbFile := FDbFile;
+    appDbMaintain.curListBox := FCurrListBox;  // needed for laod the listbox items again with changed relations
+
+    _listBox := GetTheRightListBox(1);
+    parentGuid := PtrItemObject(_listBox.Items.Objects[FSelLb1ItemIndex])^.Guid;
+    appDbMaintain.DeleteItemRel(Guid, parentGuid, Level);
+    appDbMaintain.Free;
+  end;
+
+  GetAllItemsForListbox(FCurrListBox, 0);
+  ListBoxOnClick(_listBox);
+end;
+
+procedure TFrm_main.MenuItemDeleteClick(Sender: TObject);
+begin
+  DelteItem;
+end;
+
+procedure TFrm_main.MenuItemInsertClick(Sender: TObject);
+begin
+  ButtonNewOnClick(FCurrListBox);
+end;
+
+procedure TFrm_main.MenuItemModifyClick(Sender: TObject);
+begin
+  ListBoxOnDblClick(FCurrListBox);
+end;
+
+procedure TFrm_main.ComboBoxDone(Sender: TObject);
+var
+  appDbMaintain : TAppDbMaintainComponents;
+  AllNewItems : AllItemsObjectData;
+  tmp : String;
+begin
+  //Change the item in the databse file
+  AllNewItems := nil;
+  SetLength(AllNewItems, 1);
+  AllNewItems[0].Level := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Level;
+  AllNewItems[0].Name := (Sender as TComboBox).Text;
+  AllNewItems[0].Parent_guid := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Parent_guid;
+  AllNewItems[0].Child_guid :=  PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Child_guid;
+  AllNewItems[0].Action := 'Update';
+
+  (Sender as TComboBox).OnExit := nil; // sometimes this method is called twice, this is to prevent this
+  FCurrListBox.Items[FCurrListBox.itemindex] := (Sender As TComboBox).Text;
+
+  appDbMaintain := TAppDbMaintainComponents.Create;
+  appDbMaintain.dbFile := FDbFile;
+  // insert OF update, hangt er van af.
+  if not AppDbMaintain.DoesItemNameExists(AllNewItems[0].Name, AllNewItems[0].Level) then begin  // Item name is new, then insert.
+    AppDbMaintain.UpdateItem(AllNewItems);
+  end
+  else begin
+    // naam komt voor:
+    //  dan naam niet opslaan maar wel de:
+    //    de relaties van het gewijzigde item naar het bestaande item overbrengen
+    //    als bestaande item naam niet verder voorkomt dan verwijderen
+
+
+  end;
+
+
+  AppDbMaintain.Free;
+
   PostMessage(Handle, UM_DESTROYCONTROL, 0, PtrInt(Sender));
 end;
 
-procedure TFrm_main.EditKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState
+procedure TFrm_main.ComboBoxKeyUp(Sender: TObject; var Key: Word; Shift: TShiftState
   );
 begin
   If Shift = [] then
     case Key of
-      VK_RETURN: EditDone(Sender);
+      VK_RETURN: ComboBoxDone(Sender);
       VK_ESCAPE: begin
-                   (Sender as TEdit).OnExit := nil;
+                   (Sender as TCombobox).OnExit := nil;
                    PostMessage(Handle, UM_DESTROYCONTROL, 0, PtrInt(Sender));
                  end;
     end;
 end;
 
-procedure TFrm_main.EditMouseDown(Sender: TObject; Button: TMouseButton;
+procedure TFrm_main.ComboBoxMouseDown(Sender: TObject; Button: TMouseButton;
   Shift: TShiftState; X, Y: Integer);
 begin
   If not PtInrect((Sender As TControl).ClientRect, Point(X, Y)) then
-    EditDone(Sender);
+    ComboBoxDone(Sender);
 end;
 
-procedure TFrm_main.UmDestroyControl(var msg: TMessage);
+procedure TFrm_main.ComboBoxUmDestroyControl(var msg: TMessage);
 begin
   TObject(msg.lparam).Free;
 end;
@@ -306,6 +391,26 @@ begin
     end;
 end;
 
+procedure TFrm_main.MenuItemOptionsLanguageEnClick(Sender: TObject);
+begin
+  SetDefaultLang('en');
+  MenuItemOptionsLanguageEN.Checked := True;
+  MenuItemOptionsLanguageNL.Checked := False;
+  //GetLocaleFormatSettings($409, DefaultFormatSettings);
+  SetMan.DefaultLanguage := 'en';
+  SetMan.SaveSettings;
+end;
+
+procedure TFrm_main.MenuItemOptionsLanguageNlClick(Sender: TObject);
+begin
+  SetDefaultLang('nl');
+  MenuItemOptionsLanguageNl.Checked := True;
+  MenuItemOptionsLanguageEn.Checked := False;
+  //GetLocaleFormatSettings($413, DefaultFormatSettings);
+  SetMan.DefaultLanguage := 'nl';
+  SetMan.SaveSettings;
+end;
+
 procedure TFrm_main.MenuItemProgramNewClick(Sender: TObject);
 var
   frm : TFrm_new_database;
@@ -325,8 +430,8 @@ begin
       try
         if not Appdatabase.CreateNewDatabase() then begin
           messageDlg('Fout.', 'Het aanmaken van het de database (tabellen) is mislukt.', mtInformation, [mbOK],0);
-          Frm_Main.Logging.WriteToLogError('Het aanmaken van de database (tabellen) is mislukt.');
-          Frm_main.DisableAppItems := 'Volledig uit';  { #todo : Const voor maken }
+          Logging.WriteToLogError('Het aanmaken van de database (tabellen) is mislukt.');
+          DisableAppItems := 'Volledig uit';  { #todo : Const voor maken }
         end
         else begin
           Appdatabase.InsertMeta('Columns', IntToStr(NumberOfColumns));
@@ -346,7 +451,7 @@ begin
     end;
   end;
 
-  if  DisableAppItems <> 'Volledig uit' then begin
+  if  (DisableAppItems <> 'Volledig uit') and (DisableAppItems <> '') then begin
     CreateOwnComponents;
   end;
 end;
@@ -354,23 +459,26 @@ end;
 procedure TFrm_main.MenuItemProgramOpenClick(Sender: TObject);
 var
   openDialog : TOpenDialog;
-  Levels : TAppDbMaintain;
+  appDbMaintain : TAppDbMaintain;
   i : Integer;
   _listBox : TListBox;
 begin
   Screen.Cursor := crHourGlass;
+  SetStatusbarText('Openen documentatie bestand...');
   PageControl1.ActivePage := TabSheet1;
   openDialog := TOpenDialog.Create(self);
   openDialog.InitialDir := GetCurrentDir + Settings.DatabaseFolder;
   openDialog.Options := [ofFileMustExist];
   openDialog.Filter := 'Documate files|*.db';
+
   if openDialog.Execute then begin
-    Levels := TAppDbMaintain.Create;
+    appDbMaintain := TAppDbMaintain.Create;
+
     try
       FFormOpen := True;
       FDbFile := openDialog.FileName;
-      Levels.dbFile := FDbFile; { #todo : moet anders }
-      NumberOfColumns := Levels.GetNumberOfColumns;
+      appDbMaintain.dbFile := FDbFile; { #todo : moet anders }
+      NumberOfColumns := appDbMaintain.GetNumberOfColumns;
       if FDebug then Logging.WriteToLogDebug('Database bestand openen: ' + FDbFile);
 
       RemoveListBoxObjects;  // when a database is open en a new is opened the listbox object data must be removed
@@ -384,7 +492,9 @@ begin
       if  NumberOfColumns > 0 then begin
         for i := 1 to NumberOfColumns do begin
           _listBox := GetTheRightListBox(i);
+          _listBox.Items.BeginUpdate;
           GetAllItemsForListbox(_listBox, i);
+          _listBox.Items.EndUpdate;
         end;
       end;
 
@@ -392,13 +502,14 @@ begin
       AllComponents.Free;
     finally
       FFormOpen := False;
-      Levels.Free;
+      appDbMaintain.Free;
       if FDebug then Logging.WriteToLogDebug('Database bestand is geopend');
     end;
   end
   else begin
     // Cancel opendialog
   end;
+  SetStatusbarText('');
   openDialog.Free;
   Screen.Cursor := crDefault;
 end;
@@ -511,7 +622,22 @@ begin
   SetStatusbarText('Welkom');
   SetDbNameInStatusbar('');
   MenuItemProgramCloseDb.Enabled := False;
-  FFormOPen := False
+  FFormOPen := False;
+
+  if SetMan.DefaultLanguage = 'nl' then begin
+    MenuItemOptionsLanguageNl.Checked := True;
+    MenuItemOptionsLanguageEn.Checked := False;
+    {%H-}GetLocaleFormatSettings($409, DefaultFormatSettings);{%H-}
+  end
+  else if SetMan.DefaultLanguage = 'en' then begin
+    MenuItemOptionsLanguageEn.Checked := True;
+    MenuItemOptionsLanguageNl.Checked := False;
+    {%H-}GetLocaleFormatSettings($413, DefaultFormatSettings);{%H-}
+  end
+  else begin
+    SetDefaultLang('en');
+  end;
+
   //PageControl1.Page[1].TabVisible := False;  // disable the second page.
 end;
 
@@ -536,15 +662,16 @@ begin
     newComponent.BuildBodyPanelsAndSplitters(ScrollBoxColumns); // Create "body" panels and splitters between them
     newComponent.BuildHeaderPanels;     // Create "header" panels
     newComponent.BuildSearchPanels;     // Create "search" panels
+    newComponent.BuildButtons('Next'); // Create the new item buttons
     newComponent.BuildDataPanels;       // Create "data" panels
     newComponent.BuildListBoxes;        // Create listboxes which hold the data
     newComponent.BuildLabel;            // Create the search Labels
-    HideComponents(TWinControl(TLabel));
+//    HideComponents('TLabel');
     newComponent.BuildEdit;             // Create the search Edit boxes
-    HideComponents(TWinControl(TEdit)); // hide all search edits accept the first one.
-    newComponent.BuildButtons('Next'); // Create the new item buttons
+
     newComponent.BuildButtons('New'); // Create the new item buttons
-    HideComponents(TWinControl(TButton));
+//    HideComponents('TEdit'); // hide all search edits accept the first one.
+//    HideComponents('TButton');
     DisableAllButtons;                  // Disalbe all new buttons
     EnableButtons(1);                   // Enable the first button
     SetStatusbarText('');
@@ -584,49 +711,60 @@ begin
   end;
 end;
 
-procedure TFrm_main.HideComponents(Component: TWinControl);
+procedure TFrm_main.HideComponents(ControleType : String);
 var
-  _edit : TEdit;
+  _edit : TEdit = nil;
   _label : TLabel;
   _button : TButton;
   currNumber : String;
   i, j : Integer;
 begin
-  for i := 0 to Frm_Main.ComponentCount -1 do begin
-    if Components[i] is TEdit then begin
-      _edit :=  TEdit(Components[i]);
-      currNumber := GetNumbers(_edit.Name);
-      if currNumber <> '' then begin
-        j := StrToInt(currNumber);
-      end
-      else J := 0;
-      if (Pos('EditSearch_' , _edit.Name) > 0) and (j > 1) then begin
-        _edit.Visible := False;
+  case ControleType of
+    'TEdit' : begin
+      for i := 0 to Frm_Main.ComponentCount - 1 do begin
+        if Components[i] is TEdit then begin
+          _edit :=  TEdit(Components[i]);
+          currNumber := GetNumbers(_edit.Name);
+          if currNumber <> '' then begin
+            j := StrToInt(currNumber);
+          end
+          else J := 0;
+          if (Pos('EditSearch_' , _edit.Name) > 0) and (j > 1) then begin
+            _edit.Visible := False;
+          end;
+        end
       end;
-    end
-    else if Components[i] is Tlabel then begin
-      _label :=  TLabel(Components[i]);
-      currNumber := GetNumbers(_label.Name);
-        if currNumber <> '' then begin
-          j := StrToInt(currNumber);
+    end;
+    'TLabel' : begin
+      for i := 0 to Frm_Main.ComponentCount - 1 do begin
+        if Components[i] is TLabel then begin
+          _label :=  TLabel(Components[i]);
+          currNumber := GetNumbers(_label.Name);
+          if currNumber <> '' then begin
+            j := StrToInt(currNumber);
+          end
+          else J := 0;
+          if (Pos('LabelSearchResult_' , _label.Name) > 0) and (j > 1) then begin
+            _label.Visible := False;
+          end;
         end
-        else J := 0;
-        if (Pos('LabelSearchResult_' , _label.Name) > 0) and (j > 1) then begin
-          _label.Visible := False;
-        end;
-    end
-    else if Components[i] is TButton then begin
-      _button :=  TButton(Components[i]);
-      currNumber := GetNumbers(_button.Name);
-        if currNumber <> '' then begin
-          j := StrToInt(currNumber);
+      end;
+    end;
+    'TButton' : begin
+      for i := 0 to Frm_Main.ComponentCount - 1 do begin
+        if Components[i] is TButton then begin
+          _button :=  TButton(Components[i]);
+          currNumber := GetNumbers(_button.Name);
+          if currNumber <> '' then begin
+            j := StrToInt(currNumber);
+          end
+          else J := 0;
+          if (Pos('ButtonNext_' , _button.Name) > 0) and (j > 1) then begin
+            _button.Visible := False;
+          end;
         end
-        else J := 0;
-        if (Pos('ButtonNext_' , _button.Name) > 0) and (j > 1) then begin
-          _button.Visible := False;
-        end;
-    end
-
+      end;
+    end;
   end;
 end;
 
@@ -726,7 +864,6 @@ end;
 procedure TFrm_main.ButtonNewOnClick(Sender: TObject);
 var
   _button : TButton;
-  _listbox : TListBox;
   frm : TFrm_Maintain;
   itemsNames : AllItemsObjectData;
   AllNewItems : AllItemsObjectData;
@@ -737,6 +874,14 @@ begin
   if sender is TButton then begin
     _button := TButton(sender);
     Level := StrToInt(GetNumbers(_button.Name));
+  end
+  else if sender is TListBox then begin
+    FCurrListBox := TListBox(sender);
+    Level := StrToInt(GetNumbers(FCurrListBox.Name));
+  end;
+
+  if Level > 0 then begin
+
     itemsNames := GetListBoxItems(Level);// create a list of existing items
     frm := TFrm_Maintain.Create(Self);
 
@@ -757,7 +902,7 @@ begin
       appDbMaintain := TAppDbMaintainComponents.Create;
       try
         AppDbMaintain.dbFile := FDbFile;
-        _listbox := GetTheRightListBox(level);
+        FCurrListBox := GetTheRightListBox(level);
 
         for i := 0 to Length(AllNewItems) - 1 do begin
           AllNewItems[i].Level := level;
@@ -768,25 +913,26 @@ begin
         appDbMaintain.free;
       end;
 
-      GetAllItemsForListbox(_listbox, 0);
+      GetAllItemsForListbox(FCurrListBox, 0);
 
       if level = 1 then begin // select new added item
-        if _listbox.Items.Count > 0 then begin
-          _listbox.ClearSelection;
-          i := _listbox.Items.Count;
-          _listbox.Selected[i-1] := True;
+        if FCurrListBox.Items.Count > 0 then begin
+          FCurrListBox.ClearSelection;
+          i := FCurrListBox.Items.Count;
+          FCurrListBox.Selected[i-1] := True;
         end;
       end;
     end;
 
-    _listbox := GetTheRightListBox(1);
-    ListBoxOnClick(_listbox); // Keep the New buttons enabled
+    FCurrListBox := GetTheRightListBox(1);
+    ListBoxOnClick(FCurrListBox); // Keep the New buttons enabled
   end;
 end;
 
 procedure TFrm_main.ButtonNextOnClick(Sender: TObject);
 var
   _listBox : TListBox;
+  FListBoxMaxItemIndex : Integer;
 begin
   if NumberOfColumns >= 1 then begin
     _listBox := GetTheRightListBox(1);
@@ -821,16 +967,15 @@ procedure TFrm_main.ListBoxOnClick(Sender: TObject);
 var
   i, j, curNumber : Integer;
   _edit : TEdit;
-  curListBox : TListBox;
 begin
   if sender is TListBox then begin
-    curListBox := TListBox(sender);
+    FCurrListBox := TListBox(sender);
 
-    curNumber := StrToInt(GetNumbers(curListBox.Name));  // Get the number of the list box.
+    curNumber := StrToInt(GetNumbers(FCurrListBox.Name));  // Get the number of the list box.
     if curNumber = 1 then begin
-      if curListBox.ItemIndex >= 0 then begin
-        FSelectedLb1Item := curListBox.ItemIndex; // used with ButtonNew
-        p := PtrItemObject(curListBox.Items.Objects[curListBox.ItemIndex]);
+      if FCurrListBox.ItemIndex >= 0 then begin
+        FSelLbItemIndex := FCurrListBox.ItemIndex; // used with ButtonNew
+        p := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.ItemIndex]);
         FCurrGuid := p^.Guid;
 
         // tijdelijk ter controle
@@ -851,7 +996,7 @@ begin
         end;
       end;
 
-      ColorRelatedItems(curNumber, curListBox.ItemIndex);
+      ColorRelatedItems(curNumber, FCurrListBox.ItemIndex);
     end
     else begin
       for i := 1 to NumberOfColumns do begin                      // Disable all New buttons.
@@ -866,23 +1011,94 @@ begin
     //disable search next button
     _edit := GetTheRightEdit(curNumber);
     _edit.Clear;
-    curListBox.Selected[curListBox.ItemIndex] := true;  // Reselect. Needed when search next is used.
+    if FCurrListBox.ItemIndex >= 0 then begin
+      FCurrListBox.Selected[FCurrListBox.ItemIndex] := true;  // Reselect. Needed when search next is used.
+    end;
   end;
+end;
+
+procedure TFrm_main.ListBoxOnDblClick(Sender: TObject);
+var
+  r: TRect;
+  cb: TComboBox;
+  Level : Byte;
+  itemsNames : AllItemsObjectData;
+  i : Integer;
+begin
+  if sender is TListbox then begin
+    FCurrListBox := Sender as TListbox;
+    if FCurrListBox.ItemIndex < 0 then Exit;
+  end;
+
+  cb := TComboBox.Create(Self);
+  cb.Font.Size := 9;
+  r := FCurrListBox.ItemRect(FCurrListBox.itemindex);
+  r.topleft := FCurrListBox.ClientToScreen(r.topleft);
+  r.BottomRight := FCurrListBox.clienttoscreen(r.bottomright);
+  r.topleft := ScreenToClient(r.topleft);
+  r.BottomRight := screenToClient(r.bottomright);
+
+  Level := StrToInt(GetNumbers(FCurrListBox.Name));
+  itemsNames := GetListBoxItems(Level);
+  for i := 0 to Length(itemsNames)-1 do begin
+    cb.Items.Add(itemsNames[i].Name);
+  end;
+
+  cb.Text :=  FCurrListBox.Items[FCurrListBox.itemindex];
+  cb.setbounds(r.left, r.top-2, FCurrListBox.clientwidth, r.bottom - r.top + 4);
+  cb.OnExit := @ComboBoxDone;
+  cb.OnMouseDown:= @ComboBoxMouseDown;
+  cb.OnKeyUp := @ComboBoxKeyUp;
+  cb.Parent := Self;
+  cb.SetFocus;
 end;
 
 procedure TFrm_main.ListBoxOnSelectionChange(Sender: TObject; User: boolean);
 var
-  _listBox : TListBox;
   curNumber : Integer;
 begin
   if sender is TListBox then begin
-    _listBox := TListBox(sender);
+    FCurrListBox := TListBox(sender);
 
-    curNumber := StrToInt(GetNumbers(_listBox.Name));  // Get the number of the list box.
+    curNumber := StrToInt(GetNumbers(FCurrListBox.Name));  // Get the number of the list box.
     if curNumber = 1 then begin
-      if _listBox.ItemIndex >= 0 then begin
-        ColorRelatedItems(curNumber, _listBox.ItemIndex);   { #todo : Deze regel is dubbel met listbox OnClick }
+      if FCurrListBox.ItemIndex >= 0 then begin
+        ColorRelatedItems(curNumber, FCurrListBox.ItemIndex);   { #todo : Deze regel is dubbel met listbox OnClick }
       end;
+    end;
+  end;
+end;
+
+procedure TFrm_main.ListBoxOnMouseDown(Sender: TObject; Button: TMouseButton;
+  Shift: TShiftState; X, Y: Integer);
+var
+  curNumber : Integer;
+begin
+  if sender is TListBox then begin
+    FCurrListBox := TListBox(sender);
+  end;
+
+  { #todo : Deels dubbel met listboxOnClik ==> Opschonen }
+  curNumber := StrToInt(GetNumbers(FCurrListBox.Name));  // Get the number of the list box.
+  if curNumber = 1 then begin
+    if FCurrListBox.ItemIndex >= 0 then begin
+      FSelLb1ItemIndex := FCurrListBox.ItemIndex;
+    end;
+  end;
+
+  if FSelLb1ItemIndex >= 0 then begin
+    FCurrListBox.PopupMenu := PopupMenu1;
+  end
+  else begin
+    FCurrListBox.PopupMenu := nil;
+  end;
+end;
+
+procedure TFrm_main.ListBoxOnKeyDown(Sender: TObject; var Key: Word; Shift: TShiftState);
+begin
+  if FCurrListBox.Items.Count > 0 then begin
+    if Key = VK_DELETE then begin
+      DelteItem;
     end;
   end;
 end;
@@ -890,7 +1106,6 @@ end;
 procedure TFrm_main.EditOnChange(Sender: TObject);
 var
   _edit : TEdit;
-  _listbox : TListBox;
   _label : TLabel;
   i, curNumber : Integer;
 begin
@@ -899,9 +1114,9 @@ begin
 
     // Get the right listbox to search in
     curNumber := StrToInt(GetNumbers(_edit.Name));  // Get the number of the Edit box
-    _listbox := GetTheRightListBox(curNumber);
+    FCurrListBox := GetTheRightListBox(curNumber);
 
-    i := ListBoxSearchItem(_listbox, _edit.Text);
+    i := ListBoxSearchItem(FCurrListBox, _edit.Text);
 
     // LabelSearchResult_
     _label := GetTheRightLabel(curNumber);
@@ -930,6 +1145,28 @@ begin
   end;
 
   Result := Counter;
+end;
+
+procedure TFrm_main.DelteItem;
+var
+  Guid, itemName  : String;
+  appDbMaintain : TAppDbMaintainComponents;
+  buttonSelected, Level : Integer;
+begin
+  itemName := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Name;
+  buttonSelected := MessageDlg('Wilt u "' + itemName + '" verwijderen?' ,mtConfirmation, [mbYes,mbCancel], 0);
+
+  if buttonSelected = mrYes    then begin
+    Guid := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Guid;
+    Level := PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])^.Level;
+    appDbMaintain := TAppDbMaintainComponents.Create;
+    appDbMaintain.dbFile := FDbFile;
+    appDbMaintain.DeleteItem(Guid, level);
+    appDbMaintain.Free;
+
+    Dispose(PtrItemObject(FCurrListBox.Items.Objects[FCurrListBox.itemindex])); // delete the Item.Object.
+    FCurrListBox.Items.Delete(FCurrListBox.itemindex);
+  end;
 end;
 
 procedure TFrm_main.GetAllItemsForListbox(aListBox : TListBox; level : Byte);
@@ -1018,4 +1255,5 @@ end;
 
 
 end.
+
 

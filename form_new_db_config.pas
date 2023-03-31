@@ -216,7 +216,6 @@ begin
   EditNumberOfColumns.SetFocus;
 end;
 
-
 procedure TFrm_new_database.SetStatusbarText(aText: String);
 begin
   if aText <> '' then begin

@@ -38,7 +38,6 @@ type
       function CreateButtonNext(aName : String; aParent : TWinControl) : TButton;
 
       procedure SetArrays;
-      //procedure PanelClick(Sender: TObject);
 
     public
       constructor Create(aForm : TFrm_main); overload;
@@ -176,6 +175,8 @@ begin
   //_panel.OnClick := @PanelClick;
   _panel.Left := 9999;  //Necessary because otherwise the splitter will be on the left of the panel instead of on the right
                        //https://forum.lazarus.freepascal.org/index.php?action=post;topic=62608.0;last_msg=473575
+  _panel.BevelInner := bvNone;
+  _panel.BevelOuter := bvNone;
   result := _panel;
 end;
 
@@ -194,6 +195,7 @@ end;
 function TBuildComponent.CreateEdit(aName: String; aParent: TWinControl): TEdit;
 begin
   _edit := TEdit.Create(mainForm);
+  _edit.Visible := False;
   _edit.Parent := aParent;
   _edit.Name := aName;
   _edit.Height := 28;  // Default height
@@ -206,6 +208,7 @@ function TBuildComponent.CreateLabel(aName: String; aParent: TWinControl
   ): TLabel;
 begin
   _label := TLabel.Create(mainForm);
+  _label.Visible := False;
   _label.Parent := aParent;
   _label.Name := aName;
   result := _label;
@@ -219,6 +222,9 @@ begin
   _listbox.Name := aName;
   _listbox.OnClick := @Form_Main.Frm_main.ListBoxOnClick;
   _listBox.OnSelectionChange := @Form_Main.Frm_main.ListBoxOnSelectionChange;
+  _listbox.OnDblClick := @Form_Main.Frm_main.ListBoxOnDblClick;
+  _listbox.OnMouseDown := @Form_Main.Frm_main.ListBoxOnMouseDown;
+  _listbox.OnKeyDown := @Form_Main.Frm_main.ListBoxOnKeyDown;
   result := _listbox;
 end;
 
@@ -226,8 +232,9 @@ function TBuildComponent.CreateButtonNew(aName: String; aParent: TWinControl
   ): TButton;
 begin
   _button := TButton.Create(mainForm);
+  _button.Visible := False;
   _button.Parent := aParent;
-  _button.Name := aName;
+//  _button.Name := aName;
   _button.Height := 31;  // Default height
   _button.Width := 50;   // modified
   _button.OnClick :=  @Form_Main.Frm_main.ButtonNewOnClick; //
@@ -239,10 +246,6 @@ function TBuildComponent.CreateButtonNext(aName: String; aParent: TWinControl
 begin
   _button := TButton.Create(mainForm);
   _button.Parent := aParent;
-  _button.Name := aName;
-  _button.Height := 31;  // Default height
-  _button.Width := 10;   // modified
-  _button.Caption := 'Volgende';
   _button.OnClick :=  @Form_Main.Frm_main.ButtonNextOnClick; //
   result := _button;
 end;
@@ -256,14 +259,15 @@ begin
   if aParent.Name =  'ScrollBoxMainColumn' then begin
     allPanels[0] := CreatePanel('PanelBody_' + IntToStr(1), aParent, 200);
     allPanels[0].Align := alClient;
-    allPanels[0].BevelOuter := bvNone;
+    allPanels[0].BorderStyle := bsSingle;
+    allPanels[0].Color := clSkyBlue;
   end
   else if aParent.Name =  'ScrollBoxColumns' then begin
     for i := 2 to NumberOfColumns do begin
       allPanels[i-1] := CreatePanel('PanelBody_' + IntToStr(i), aParent, 200);
       allPanels[i-1].AnchorSide[akLeft].Control := aParent;
       allPanels[i-1].Align := alLeft;
-      allPanels[i-1].BevelOuter := bvNone;
+      allPanels[i-1].BorderStyle := bsSingle;
 
       if i = NumberOfColumns then begin // build 1 splitter less and align the last panel allClient
         allPanels[i-1].Align := alClient;
@@ -289,7 +293,6 @@ begin
       newPanels[newPanelNumber-1] := CreatePanel('PanelHeader_' + IntToStr(newPanelNumber), allPanels[i], 50);
 
       newPanels[newPanelNumber-1].Align := alTop;
-      // newPanels[newPanelNumber-1].Caption := 'PanelHeader_'+ IntToStr(newPanelNumber);
       newPanels[newPanelNumber-1].Caption := '';
       inc(newPanelNumber);
     end;
@@ -396,8 +399,11 @@ begin
       newEditboxes[newEditbox-1].Left := 8;
       newEditboxes[newEditbox-1].Top := 16;
       newEditboxes[newEditbox-1].Text := '';
-      newEditboxes[newEditbox-1].TextHint := 'Zoek item';  { #todo : Optioneel maken }
+      newEditboxes[newEditbox-1].TextHint := 'Search item';  { #todo : Optioneel maken }
       newEditboxes[newEditbox-1].Anchors := [TAnchorKind.akLeft, TAnchorKind.akRight];
+
+      if newEditbox-1 > 0 then newEditboxes[newEditbox-1].Visible := False else  // For now only the first listbox has search function
+        newEditboxes[newEditbox-1].Visible := True;
       Inc(newEditbox);
     end;
   end;
@@ -418,6 +424,8 @@ begin
         newButtons[newButton-1].Top := 16;
         newButtons[newButton-1].Name := 'ButtonNew_' + IntToStr(newButton);
         newButtons[newButton-1].Caption := aCaption;
+        newButtons[newButton-1].Anchors := [TAnchorKind.akLeft];
+        newButtons[newButton-1].Visible := True;
         Inc(newButton);
       end;
     end;
@@ -436,6 +444,8 @@ begin
         newButtons[newButton-1].Name := 'ButtonNext_' + IntToStr(newButton);
         newButtons[newButton-1].Caption := '>';
         newButtons[newButton-1].Anchors := [TAnchorKind.akRight];
+        if newButton-1 > 0 then newButtons[newButton-1].Visible := False else  // For now only the first listbox has search function
+          newButtons[newButton-1].Visible := True;
         Inc(newButton);
       end;
     end;
@@ -456,10 +466,11 @@ begin
       newlabels[newLabel-1].Top := 16;
       newlabels[newLabel-1].Caption := 'st';
       newlabels[newLabel-1].Anchors := [TAnchorKind.akRight];
+      if newLabel-1 > 0 then newlabels[newLabel-1].Visible := False else  // For now only the first listbox has search function
+        newlabels[newLabel-1].Visible := True;
       Inc(newLabel);
     end;
   end;
-
 end;
 
 
