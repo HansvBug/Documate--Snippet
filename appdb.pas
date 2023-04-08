@@ -18,11 +18,11 @@ type
     protected
       property BaseFolder      : String Read FBaseFolder Write FBaseFolder;
       property DatabaseVersion : String Read FDatabaseVersion write FDatabaseVersion;
+      property dbFile : String Read FdbFile Write FdbFile;
 
     public
-      constructor Create; overload;
+      constructor Create(FullDbFilePath : String); overload;
       destructor  Destroy; override;
-      property dbFile : String Read FdbFile Write FdbFile;
 
     published
   end;
@@ -37,11 +37,9 @@ uses Settings;
 
 { TAppDatabase }
 
-constructor TAppDatabase.Create;
+constructor TAppDatabase.Create(FullDbFilePath : String);
 begin
-  inherited;
-  // BaseFolder := ExtractFilePath(Application.ExeName);
-  // dbFile := BaseFolder + Settings.DatabaseFolder + PathDelim + Settings.DatabaseName; kan NIET meer je kunt nu een db openen
+  FdbFile := FullDbFilePath;
   DatabaseVersion := Settings.DataBaseVersion;
 end;
 

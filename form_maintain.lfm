@@ -1,7 +1,7 @@
 object Frm_Maintain: TFrm_Maintain
-  Left = 2309
+  Left = 2602
   Height = 138
-  Top = 155
+  Top = 239
   Width = 475
   Caption = 'Frm_Maintain'
   ClientHeight = 138
@@ -17,8 +17,8 @@ object Frm_Maintain: TFrm_Maintain
     Left = 24
     Height = 20
     Top = 24
-    Width = 108
-    Caption = 'Kies of voeg toe'
+    Width = 62
+    Caption = 'Add item'
     ParentColor = False
   end
   object ComboBoxNewItem: TComboBox
@@ -34,7 +34,7 @@ object Frm_Maintain: TFrm_Maintain
     OnExit = ComboBoxNewItemExit
     ParentShowHint = False
     TabOrder = 0
-    TextHint = 'Nieuw item'
+    TextHint = 'New item'
   end
   object ButtonAddItem: TButton
     Left = 152
@@ -42,7 +42,7 @@ object Frm_Maintain: TFrm_Maintain
     Top = 90
     Width = 126
     Anchors = [akRight, akBottom]
-    Caption = 'Voeg toe'
+    Caption = 'Add'
     OnClick = ButtonAddItemClick
     TabOrder = 1
   end
@@ -52,7 +52,7 @@ object Frm_Maintain: TFrm_Maintain
     Top = 90
     Width = 94
     Anchors = [akRight, akBottom]
-    Caption = 'Sluiten'
+    Caption = 'Close'
     OnClick = ButtonCloseClick
     TabOrder = 2
   end
@@ -61,7 +61,7 @@ object Frm_Maintain: TFrm_Maintain
     Height = 31
     Top = 90
     Width = 126
-    Caption = 'Voeg nog 1 toe'
+    Caption = 'Add multiple'
     OnClick = ButtonAddNextItemClick
     TabOrder = 3
   end

@@ -15,11 +15,19 @@ type
     Guid         : String;
     Level        : Integer;
     Parent_guid  : array of String;
+    Org_Parent_guid  : array of String;
     Child_guid   : String;
     Name         : String;
     Action       : String;
   end;
   AllItemsObjectData = array of ItemObjectData;
+
+type
+  ItemCollection = record
+    Level : Integer;
+    Name  : String;
+  end;
+  ItemsCollection = array of ItemCollection;
 
 var
   p : PtrItemObject;

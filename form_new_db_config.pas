@@ -8,6 +8,9 @@ uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ComCtrls,
   Visual, SettingsManager;
 
+const
+  NUMBER_OF_COLS = 20;
+
 type
 
   { TFrm_new_database }
@@ -22,10 +25,16 @@ type
     LabelColumnNumber: TLabel;
     StatusBarFrmNewDb: TStatusBar;
     procedure ButtonCancelClick(Sender: TObject);
+    procedure ButtonCancelMouseLeave(Sender: TObject);
+    procedure ButtonCancelMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
     procedure ButtonNewFileClick(Sender: TObject);
     procedure ButtonNewFileMouseLeave(Sender: TObject);
     procedure ButtonNewFileMouseMove(Sender: TObject);
     procedure ButtonStopClick(Sender: TObject);
+    procedure ButtonStopMouseLeave(Sender: TObject);
+    procedure ButtonStopMouseMove(Sender: TObject; Shift: TShiftState; X,
+      Y: Integer);
     procedure EditDescriptionShortChange(Sender: TObject);
     procedure EditDescriptionShortEnter(Sender: TObject);
     procedure EditDescriptionShortExit(Sender: TObject);
@@ -39,9 +48,9 @@ type
     procedure FormClose(Sender: TObject; var CloseAction: TCloseAction);
     procedure FormCloseQuery(Sender: TObject; var CanClose: Boolean);
     procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private
+
     SetMan : TSettingsManager;
     Visual : TVisual;
     FCanClose, FCancel : Boolean;
@@ -79,6 +88,24 @@ begin
   Close;
 end;
 
+procedure TFrm_new_database.ButtonStopClick(Sender: TObject);
+begin
+  FCanClose := true;
+  Frm_Main.CanContinue := False;
+  Close;
+end;
+
+procedure TFrm_new_database.ButtonCancelMouseLeave(Sender: TObject);
+begin
+  SetStatusbarText(Visual.Helptext(Sender, ''));
+end;
+
+procedure TFrm_new_database.ButtonCancelMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  SetStatusbarText(Visual.Helptext(Sender, 'Naam van het database bestand aanpassen.'));
+end;
+
 procedure TFrm_new_database.ButtonNewFileMouseLeave(Sender: TObject);
 begin
   SetStatusbarText(Visual.Helptext(Sender, ''));
@@ -89,17 +116,23 @@ begin
   SetStatusbarText(Visual.Helptext(Sender, 'Het database bestand wordt aangemaakt.'));
 end;
 
-procedure TFrm_new_database.ButtonStopClick(Sender: TObject);
+procedure TFrm_new_database.ButtonStopMouseLeave(Sender: TObject);
 begin
-  FCanClose := true;
-  Frm_Main.CanContinue := False;
-  Close;
+  SetStatusbarText(Visual.Helptext(Sender, ''));
+end;
+
+procedure TFrm_new_database.ButtonStopMouseMove(Sender: TObject;
+  Shift: TShiftState; X, Y: Integer);
+begin
+  SetStatusbarText(Visual.Helptext(Sender, 'Geen database bestand aanmaken.'));
 end;
 
 procedure TFrm_new_database.EditDescriptionShortChange(Sender: TObject);
 begin
-  if Visual.CheckEntryLength(Sender, 255) then begin
-    ButtonNewFile.Enabled := True;
+  if (Visual.CheckEntryLength(Sender, 255)) or (EditDescriptionShort.Text = '') then begin
+    if StrToInt(EditNumberOfColumns.Text) <= NUMBER_OF_COLS then begin
+      ButtonNewFile.Enabled := True;
+    end;
   end
   else begin
     ButtonNewFile.Enabled := False;
@@ -131,9 +164,9 @@ end;
 procedure TFrm_new_database.EditNumberOfColumnsChange(Sender: TObject);
 begin
   if EditNumberOfColumns.Text <> '' then begin
-    if StrToInt(EditNumberOfColumns.Text) > 20 then begin
+    if StrToInt(EditNumberOfColumns.Text) > NUMBER_OF_COLS then begin
       EditNumberOfColumns.Font.Color := clRed;
-      SetStatusbarText('U kunt maximaal 20 kolommen opgeven.');
+      SetStatusbarText('U kunt maximaal '+ IntToStr(NUMBER_OF_COLS) + ' kolommen opgeven.');
       ButtonNewFile.Enabled := False;
       FCanClose := False;
     end
@@ -149,6 +182,10 @@ begin
       ButtonNewFile.Enabled := True;
       FCanClose := True;
     end;
+  end
+  else if EditNumberOfColumns.Text = '' then begin
+    ButtonNewFile.Enabled := False;
+    FCanClose := False;
   end
   else begin
     EditNumberOfColumns.Font.Color := clDefault;
@@ -168,6 +205,16 @@ end;
 procedure TFrm_new_database.EditNumberOfColumnsExit(Sender: TObject);
 begin
   Visual.ActiveTextBackGroundColor(Sender, False);
+
+  if EditNumberOfColumns.Text <> '' then begin
+    if StrToInt(EditNumberOfColumns.Text) < 1  then begin
+      ButtonNewFile.Enabled := False;
+      SetStatusbarText(Visual.Helptext(Sender, 'Minimaal 2 kolommen zijn benodigd.'));
+    end
+  end
+  else begin
+    ButtonNewFile.Enabled := False;
+  end;
 end;
 
 procedure TFrm_new_database.EditNumberOfColumnsMouseLeave(Sender: TObject);
@@ -177,7 +224,7 @@ end;
 
 procedure TFrm_new_database.EditNumberOfColumnsMouseMove(Sender: TObject);
 begin
-  SetStatusbarText(Visual.Helptext(Sender, 'Geef het aantal kolommen op.'));
+  SetStatusbarText(Visual.Helptext(Sender, 'Geef het aantal kolommen op. Minimaal 2.'));
 end;
 
 procedure TFrm_new_database.FormClose(Sender: TObject;
@@ -202,13 +249,6 @@ begin
   Visual := TVisual.Create;
   FCanClose := False;
   FCancel := False;
-end;
-
-procedure TFrm_new_database.FormDestroy(Sender: TObject);
-begin
-  if FCancel then begin
-    Frm_main.MenuItemProgramNewClick(Self);
-  end;
 end;
 
 procedure TFrm_new_database.FormShow(Sender: TObject);

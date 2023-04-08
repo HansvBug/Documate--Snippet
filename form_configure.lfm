@@ -1,11 +1,13 @@
 object Frm_Configure: TFrm_Configure
-  Left = 2916
+  Left = 2922
   Height = 288
-  Top = 199
+  Top = 192
   Width = 749
+  BorderStyle = bsToolWindow
   Caption = 'Frm_Configure'
   ClientHeight = 288
   ClientWidth = 749
+  Color = clWindow
   DesignTimePPI = 120
   OnClose = FormClose
   OnCreate = FormCreate
@@ -17,7 +19,7 @@ object Frm_Configure: TFrm_Configure
     Top = 248
     Width = 94
     Anchors = [akRight, akBottom]
-    Caption = 'Sluiten'
+    Caption = 'Close'
     OnClick = ButtonCloseClick
     TabOrder = 0
   end
@@ -49,7 +51,7 @@ object Frm_Configure: TFrm_Configure
           Height = 24
           Top = 8
           Width = 134
-          Caption = 'Logging is actief'
+          Caption = 'Activate logging'
           OnChange = CheckBoxActivateLoggingChange
           OnMouseLeave = CheckBoxActivateLoggingMouseLeave
           OnMouseMove = CheckBoxActivateLoggingMouseMove
@@ -59,8 +61,8 @@ object Frm_Configure: TFrm_Configure
           Left = 8
           Height = 24
           Top = 32
-          Width = 172
-          Caption = 'Aanvullen log bestand'
+          Width = 128
+          Caption = 'Append log file'
           OnMouseLeave = CheckBoxAppendLogFileMouseLeave
           OnMouseMove = CheckBoxAppendLogFileMouseMove
           TabOrder = 1
@@ -71,7 +73,7 @@ object Frm_Configure: TFrm_Configure
         Height = 100
         Top = 24
         Width = 231
-        Caption = 'Visueel'
+        Caption = 'Visual'
         ClientHeight = 75
         ClientWidth = 227
         TabOrder = 1
@@ -79,8 +81,8 @@ object Frm_Configure: TFrm_Configure
           Left = 16
           Height = 24
           Top = 8
-          Width = 143
-          Caption = 'Achtergrond kleur'
+          Width = 149
+          Caption = 'Background colour'
           OnMouseLeave = CheckBoxBackGroundColorActiveControleMouseLeave
           OnMouseMove = CheckBoxBackGroundColorActiveControleMouseMove
           ParentShowHint = False
@@ -90,8 +92,8 @@ object Frm_Configure: TFrm_Configure
           Left = 16
           Height = 24
           Top = 32
-          Width = 138
-          Caption = 'Toon hulpteksten'
+          Width = 128
+          Caption = 'Show help texts'
           OnChange = CheckBoxDisplayHelpTextChange
           OnMouseLeave = CheckBoxDisplayHelpTextMouseLeave
           OnMouseMove = CheckBoxDisplayHelpTextMouseMove
@@ -112,14 +114,6 @@ object Frm_Configure: TFrm_Configure
         ClientHeight = 175
         ClientWidth = 731
         TabOrder = 0
-        object LabelCopyDbFile: TLabel
-          Left = 8
-          Height = 20
-          Top = 8
-          Width = 174
-          Caption = 'Kopieer database bestand'
-          ParentColor = False
-        end
         object EditCopyDbFile: TEdit
           Left = 192
           Height = 28
@@ -184,6 +178,14 @@ object Frm_Configure: TFrm_Configure
           Flat = True
           OnClick = SpeedButtonSQLliteDllLocationClick
           ParentFont = False
+        end
+        object LabelCopyDbFile: TLabel
+          Left = 8
+          Height = 20
+          Top = 8
+          Width = 124
+          Caption = 'Copy database file'
+          ParentColor = False
         end
       end
     end

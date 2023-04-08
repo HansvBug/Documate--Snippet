@@ -23,7 +23,7 @@
       <UseVersionInfo Value="True"/>
       <MinorVersionNr Value="3"/>
       <Attributes pvaDebug="True"/>
-      <StringTable Comments="Tool for documenting. (Snippet)" CompanyName="Hans van Buggenum" ProductName="Documate" ProductVersion="1.0.0.0"/>
+      <StringTable CompanyName="Hans van Buggenum" FileDescription="Tool for documenting. (Snippet)" LegalCopyright="HvB" ProductName="Documate" ProductVersion="1.0.0.0"/>
     </VersionInfo>
     <BuildModes>
       <Item Name="Default" Default="True"/>
@@ -108,6 +108,9 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="richmemopackage"/>
+      </Item>
+      <Item>
         <PackageName Value="FCL"/>
       </Item>
       <Item>
@@ -153,9 +156,9 @@
         <UnitName Value="AppDbItems"/>
       </Unit>
       <Unit>
-        <Filename Value="appdbmaintaincomponents.pas"/>
+        <Filename Value="appdbmaintainitems.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="AppDbMaintainComponents"/>
+        <UnitName Value="AppDbMaintainItems"/>
       </Unit>
       <Unit>
         <Filename Value="appdb.pas"/>

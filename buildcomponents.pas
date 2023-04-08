@@ -199,7 +199,6 @@ begin
   _edit.Parent := aParent;
   _edit.Name := aName;
   _edit.Height := 28;  // Default height
-  _edit.Width := 100;  // Default with;
   _edit.OnChange := @Form_Main.Frm_main.EditOnChange; //
   result := _edit;
 end;
@@ -399,6 +398,7 @@ begin
       newEditboxes[newEditbox-1].Left := 8;
       newEditboxes[newEditbox-1].Top := 16;
       newEditboxes[newEditbox-1].Text := '';
+      newEditboxes[newEditbox-1].Width := allpanels[i].Width - 50;
       newEditboxes[newEditbox-1].TextHint := 'Search item';  { #todo : Optioneel maken }
       newEditboxes[newEditbox-1].Anchors := [TAnchorKind.akLeft, TAnchorKind.akRight];
 

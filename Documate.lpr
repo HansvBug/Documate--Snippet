@@ -3,16 +3,11 @@ program Documate;
 {$mode objfpc}{$H+}
 
 uses
-  {$IFDEF UNIX}
-  cthreads,
-  {$ENDIF}
-  {$IFDEF HASAMIGA}
-  athreads,
-  {$ENDIF}
   Interfaces, // this includes the LCL widgetset
+  lcltranslator,
   Forms, Settings, DataModule, Form_Main, BuildComponents, 
 form_new_db_config, Form_Maintain,
-  AppDbItems, AppDbMaintainComponents, AppDb, Form_Configure, AppDbCreate
+  AppDbItems, AppDbMaintainItems, AppDb, Form_Configure, AppDbCreate
   { you can add units after this };
 
 {$R *.res}

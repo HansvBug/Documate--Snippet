@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
-  AppDbItems, Visual, SettingsManager, AppDbMaintainComponents,
+  AppDbItems, Visual, SettingsManager,
   form_Main;
 
 type
@@ -113,6 +113,7 @@ begin
       delete(NewItemObjectData, i, 1);
     end;
   end;
+  CanClose := True; // Just to avoid hint CanClose is not used.
 end;
 
 procedure TFrm_Maintain.ButtonCloseClick(Sender: TObject);
@@ -143,7 +144,7 @@ begin
     for i := 0 to Length(NewItemObjectData)-1 do begin
       if NewItemObjectData[i].Name = ComboBoxNewItem.Text then begin
 
-        if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Nieuw item aan de array toevoegen. (ButtonAddItemClick)/');
+        if Frm_Main.DebugMode then Frm_Main.Logging.WriteToLogDebug('Nieuw item aan de array toevoegen. (ButtonAddItemClick)/');
         NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
         NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
         NewItemObjectData[FCounter-1].Level := CurrLevel;
@@ -157,7 +158,7 @@ begin
     end;
 
     if isNew then begin
-      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Nieuw item aan de array toevoegen. (ButtonAddItemClick)/');
+      if Frm_Main.DebugMode then Frm_Main.Logging.WriteToLogDebug('Nieuw item aan de array toevoegen. (ButtonAddItemClick)/');
       SetLength(NewItemObjectData, FCounter);
       NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
       NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
@@ -182,7 +183,7 @@ begin
   if ComboBoxNewItem.Text <> '' then begin
     isNew := True;
     for i := 0 to Length(NewItemObjectData)-1 do begin
-      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Volgend nieuw item aan de array toevoegen. (ButtonAddNextItemClick)/');
+      if Frm_Main.DebugMode then Frm_Main.Logging.WriteToLogDebug('Volgend nieuw item aan de array toevoegen. (ButtonAddNextItemClick)/');
       if NewItemObjectData[i].Name = ComboBoxNewItem.Text then begin
         NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
         NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();
@@ -197,7 +198,7 @@ begin
     end;
 
     if isNew then begin
-      if Frm_Main.FDebug then Frm_Main.Logging.WriteToLogDebug('Volgend nieuw item aan de array toevoegen. (ButtonAddNextItemClick)/');
+      if Frm_Main.DebugMode then Frm_Main.Logging.WriteToLogDebug('Volgend nieuw item aan de array toevoegen. (ButtonAddNextItemClick)/');
       SetLength(NewItemObjectData, FCounter);
       NewItemObjectData[FCounter-1].Name := ComboBoxNewItem.Text;
       NewItemObjectData[FCounter-1].Guid := TGUID.NewGuid.ToString();

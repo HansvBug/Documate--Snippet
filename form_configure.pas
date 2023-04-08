@@ -225,7 +225,7 @@ end;
 procedure TFrm_Configure.FormCreate(Sender: TObject);
 begin
   SetMan := TSettingsManager.Create;
-  Caption := 'Opties';
+  Caption := 'Options';
   ReadSettings;
   Visual := TVisual.Create;
   PageControl1.ActivePage := TabSheetDivers;
